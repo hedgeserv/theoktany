@@ -141,3 +141,87 @@ class SMSAuthTests(unittest.TestCase):
             raise AssertionError('User sms was activated twice')
         except ApiException as err:
             self.assertIn("Factor already exists.", str(err))
+
+    def test_send_sms_user_attributes(self):
+        """Ensure that user has OKTA ID for sms sending"""
+
+        user_without_id = self.user
+        user_without_id.id = None
+
+        with self.assertRaises(ValueError):
+            self.auth_client.send_sms_challenge(user_without_id)
+
+    def test_send_sms_challenge_invalid_user_id(self):
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_send_sms_challenge_invalid_user_id.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        auth_client = OktaAuthClient(api_client)
+
+        self.user.id = 'invalid_id'
+        try:
+            auth_client.send_sms_challenge(self.user)
+            raise AssertionError('User id was not invalid when it should have been')
+        except ApiException as err:
+            self.assertIn('invalid_id', str(err))
+
+    def test_send_sms_challenge_unenrolled_user(self):
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_user_not_enrolled.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        auth_client = OktaAuthClient(api_client)
+
+        try:
+            auth_client.send_sms_challenge(self.user)
+            raise AssertionError('User is enrolled and should not have been.')
+        except EnrollmentException as err:
+            self.assertIn('User not associated with sms factor', str(err))
+
+    def test_send_sms_challenge(self):
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_send_sms_challenge.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        auth_client = OktaAuthClient(api_client)
+
+        try:
+            auth_client.send_sms_challenge(self.user)
+        except ApiException as err:
+            raise AssertionError('Sending SMS challenge failed: ' + str(err))
+
+    def test_verify_sms_challenge_user_attributes(self):
+        """Ensure that user has OKTA ID for sms sending"""
+
+        user_without_id = self.user
+        user_without_id.id = None
+
+        with self.assertRaises(ValueError):
+            self.auth_client.verify_sms_challenge_passcode(user_without_id, '123456')
+
+    def test_verify_sms_challenge_invalid_user_id(self):
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_verify_sms_challenge.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        auth_client = OktaAuthClient(api_client)
+
+        self.user.id = 'invalid_id'
+        try:
+            auth_client.verify_sms_challenge_passcode(self.user, '123456')
+            raise AssertionError('User id was not invalid when it should have been')
+        except ApiException as err:
+            self.assertIn('invalid_id', str(err))
+
+    def test_verify_sms_challenge_invalid_passcode(self):
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_verify_invalid_sms_challenge_code.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        auth_client = OktaAuthClient(api_client)
+
+        try:
+            auth_client.verify_sms_challenge_passcode(self.user, '123456')
+            raise AssertionError("Passcode was valid and shouldn't have been")
+        except ApiException as err:
+            self.assertIn("passcode doesn't match our records", str(err))
+
+    def test_verify_sms_challenge(self):
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_verify_sms_challenge.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        auth_client = OktaAuthClient(api_client)
+
+        try:
+            auth_client.verify_sms_challenge_passcode(self.user, '123456')
+        except ApiException:
+            raise AssertionError("Passcode was invalid and shouldn't have been")
