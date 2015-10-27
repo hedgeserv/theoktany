@@ -1,0 +1,71 @@
+[
+  {
+    "predicates": [
+      {
+        "equals": {
+          "method": "GET",
+          "path": "/api/v1/users/00u15s1KDETTQMQYABRL/factors"
+        }
+      }
+    ],
+    "responses": [
+      {
+        "is": {
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": [
+            {
+            "id": "mbl1nz9JHJGHWRKMTLHP",
+            "factorType": "token:software:totp",
+            "provider": "OKTA",
+            "status": "PENDING_ACTIVATION",
+            "created": "2014-08-05T20:59:49.000Z",
+            "lastUpdated": "2014-08-06T03:59:49.000Z",
+            "profile": {
+              "phoneNumber": "+1-555-415-1337"
+            },
+            "_links": {
+              "activate": {
+                "href": "https://your-domain.okta.com/api/v1/users/00u15s1KDETTQMQYABRL/factors/mbl1nz9JHJGHWRKMTLHP/lifecycle/activate",
+                "hints": {
+                  "allow": [
+                    "POST"
+                  ]
+                }
+              },
+              "resend": [
+                {
+                  "name": "sms",
+                  "href": "https://your-domain.okta.com/api/v1/users/00u15s1KDETTQMQYABRL/factors/mbl1nz9JHJGHWRKMTLHP/resend",
+                  "hints": {
+                    "allow": [
+                      "POST"
+                    ]
+                  }
+                }
+              ],
+              "self": {
+                "href": "https://your-domain.okta.com/api/v1/users/00u15s1KDETTQMQYABRL/factors/mbl1nz9JHJGHWRKMTLHP",
+                "hints": {
+                  "allow": [
+                    "GET"
+                  ]
+                }
+              },
+              "user": {
+                "href": "https://your-domain.okta.com/api/v1/users/00u15s1KDETTQMQYABRL",
+                "hints": {
+                  "allow": [
+                    "GET"
+                  ]
+                }
+              }
+            }
+          }
+          ]
+        }
+      }
+    ]
+  }
+]
