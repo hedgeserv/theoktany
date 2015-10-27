@@ -1,18 +1,45 @@
+"""
+To run tests in PyCharm:
+
+Create a new Run/Debug configuration configuration
+"""
+
+import sys
 import unittest
 
-# from tests.mb_wrapper import MountebankProcess
+from tests.mb_wrapper import MountebankProcess
 
-# We cannot put this in if __name__ == "__main__" because PyCharm must import the script, so __name__ doesn't equal
-# "__main__".
 
-# automatically discover tests
-suite = unittest.TestLoader().discover('.')
+def main():
+    # automatically discover tests
+    suite = unittest.TestLoader().discover('.')
 
-# start mountebank
-# mb_proc = MountebankProcess()
-# mb_proc.start()
+    # start mountebank, exit on failure
+    mb_proc = MountebankProcess()
+    try:
+        print('Starting mountebank...')
+        mb_proc.start()
+        print('Mountebank started.')
+        sys.stdout.flush()
+    except Exception as err:
+        print(err)
+        sys.exit(-1)
 
-# run tests
-unittest.TextTestRunner().run(suite)
+    # run tests
+    unittest.TextTestRunner().run(suite)
 
-# mb_proc.stop()
+    try:
+        sys.stdout.flush()
+        print('Stopping mountebank...')
+        return_code = mb_proc.stop()
+    except Exception as err:
+        print(err)
+        sys.exit(-1)
+
+    if return_code != 0:
+        print('Mountebank closed with a status of {}.'.format(return_code))
+    else:
+        print('Mountebank stopped properly.')
+
+if __name__ == "__main__":
+    main()

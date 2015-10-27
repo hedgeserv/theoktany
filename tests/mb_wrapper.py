@@ -2,6 +2,7 @@ import json
 import os
 import subprocess
 from subprocess import Popen
+from time import sleep
 
 import requests
 
@@ -28,9 +29,11 @@ class MountebankProcess(object):
     def start(self):
         # TODO: shair: mb is not starting correctly
         self.mb_proc = Popen(
-            'mb', shell=True, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=None)
+            'mb start', shell=True, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=None)
+        # give mb some time to spin up and open its ports
+        sleep(2)
         if self.mb_proc.poll() is not None:
-            raise Exception('Mountebank did not start properly.')
+            raise Exception('Mountebank did not start properly (is it installed and linked to your PATH?).')
 
     def create_imposter(self, stub_filename, port=5555):
         imposter = self.create_stubs(stub_filename, port=port)
@@ -58,9 +61,9 @@ class MountebankProcess(object):
         try:
             return_code = self.mb_proc.wait(timeout=5)
         except TimeoutError:
-            raise Exception('Mountebank did not stop properly.')
-        if return_code != 0:
-            print('Mountebank closed with a status of {}.'.format(return_code))
+            raise Exception('Mountebank did not stop properly (it may still be running!).')
+
+        return return_code
 
     def create_stubs(self, stub_filename, port=5555, name='imposter'):
         # shamelessly stolen from Tim and grid-webapp-client, then slightly modified somewhat modified
@@ -73,10 +76,4 @@ class MountebankProcess(object):
             for response in stub['responses']:
                 response['is']['body'] = json.dumps(response['is']['body'])
 
-        # impostor = {"port": 5555, "protocol": "http", "name": "TCK", "stubs": stubs}
         return {"port": port, "protocol": PROTOCOL, "name": name, "stubs": stubs}
-
-        # response = requests.post(url='http://localhost:2525/imposters',
-        #                          json=impostor,
-        #                          headers={'Accept': 'application/json', 'Content-Type': 'application/json'})
-        # assert response.status_code == 201, 'Error creating mb stub {}'.format(response.status_code)
