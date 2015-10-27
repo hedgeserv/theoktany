@@ -50,6 +50,9 @@ coverage.xml
 # Django stuff:
 *.log
 
+# Subprocess stuff
+*.pid
+
 # Sphinx documentation
 docs/_build/
 

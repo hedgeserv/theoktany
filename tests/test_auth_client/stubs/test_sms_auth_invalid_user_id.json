@@ -1,0 +1,29 @@
+[
+  {
+    "predicates": [
+      {
+        "equals": {
+          "method": "POST",
+          "path": "/api/v1/users/invalid_id/factors"
+        }
+      }
+    ],
+    "responses": [
+      {
+        "is": {
+          "statusCode": 404,
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "errorCode": "E0000007",
+            "errorSummary": "Not found: Resource not found: invalid_id (User)",
+            "errorLink": "E0000007",
+            "errorCauses": [],
+            "errorId": "oaeinnziNStQHuDfv6ApTKCIg"
+          }
+        }
+      }
+    ]
+  }
+]
