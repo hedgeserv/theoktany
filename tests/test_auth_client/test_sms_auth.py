@@ -2,7 +2,7 @@ import unittest
 
 from theocktany.auth_client import OktaAuthClient
 from theocktany.client import ApiClient
-from theocktany.exceptions import ApiException
+from theocktany.exceptions import ApiException, EnrollmentException
 from theocktany.user import User
 
 from tests.mb_wrapper import MountebankProcess
@@ -19,7 +19,7 @@ class SMSAuthTests(unittest.TestCase):
     def tearDown(self):
         self.mb.destroy_all_imposters()
 
-    def test_user_attributes(self):
+    def test_enrollment_user_attributes(self):
         """Ensure that user has OKTA ID and phone number"""
 
         user_without_id = self.user
@@ -64,7 +64,7 @@ class SMSAuthTests(unittest.TestCase):
 
     def test_sms_enrollment_invalid_phone_number(self):
         """Ensure whether proper error is thrown if invalid phone number is passed"""
-         # TODO: shair: look into matching POST data so that we can us the test_sms_auth.json predicate
+        # TODO: shair: look into matching POST data so that we can us the test_sms_auth.json predicate
 
         imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_invalid_phone_number.json')
         api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
@@ -75,3 +75,69 @@ class SMSAuthTests(unittest.TestCase):
             auth_client.enroll_user_for_sms(self.user)
         except ApiException as err:
             self.assertIn('Invalid Phone Number', str(err))
+
+    def test_activation_user_attributes(self):
+        """Ensure that user has OKTA ID for sms factor activation"""
+
+        user_without_id = self.user
+        user_without_id.id = None
+
+        with self.assertRaises(ValueError):
+            self.auth_client.activate_sms_factor(user_without_id, None)
+
+    def test_sms_activation_invalid_user_id(self):
+        """Ensure whether proper error is thrown if invalid user id is passed during activation"""
+
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_invalid_user_id.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        auth_client = OktaAuthClient(api_client)
+
+        self.user.id = 'invalid_id'
+        try:
+            auth_client.activate_sms_factor(self.user, "1234567")
+        except ApiException as err:
+            self.assertIn('invalid_id', str(err))
+
+    def test_sms_activation_user_not_enrolled(self):
+        """Testing SMS factor activation for a user that isn't enrolled in sms authentication"""
+
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_user_not_enrolled.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        auth_client = OktaAuthClient(api_client)
+
+        try:
+            auth_client.activate_sms_factor(self.user, "123456")
+            raise AssertionError("User was enrolled and shouldn't have been")
+        except EnrollmentException as err:
+            self.assertIn('User not associated with sms factor', str(err))
+
+    def test_sms_activation_invalid_passcode(self):
+        """Ensure that error is thrown if an invalid passcode is passed"""
+
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_invalid_passcode.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        auth_client = OktaAuthClient(api_client)
+
+        try:
+            auth_client.activate_sms_factor(self.user, '123456')
+            raise AssertionError("Passcode was valid and shouldn't have been")
+        except ApiException as err:
+            self.assertIn("passcode doesn't match our records", str(err))
+
+    def test_sms_activation(self):
+        """Test passcode activation and ensure that a user cannot be activated twice"""
+
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_activation.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        auth_client = OktaAuthClient(api_client)
+
+        try:
+            auth_client.activate_sms_factor(self.user, '123456')
+        except ApiException:
+            raise AssertionError("Passcode was invalid and shouldn't have been")
+
+        try:
+            auth_client.activate_sms_factor(self.user, '123456')
+            raise AssertionError('User sms was activated twice')
+        except ApiException as err:
+            self.assertIn("Factor already exists.", str(err))

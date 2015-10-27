@@ -37,7 +37,11 @@ class ApiClient(object):
 
         if response is None:
             raise ApiException('No response received.')
-        return response.content.decode('UTF-8'), response.status_code
+        try:
+            response_dict = response.json()
+            return response_dict, response.status_code
+        except ValueError:
+            raise ApiException('Response was invalid.')
 
     def post(self, path, data=None):
         response = requests.post(self._base_url+path, json=data, headers=self._headers)

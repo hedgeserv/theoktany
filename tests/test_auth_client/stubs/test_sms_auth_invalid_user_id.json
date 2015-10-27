@@ -3,7 +3,6 @@
     "predicates": [
       {
         "equals": {
-          "method": "POST",
           "path": "/api/v1/users/invalid_id/factors"
         }
       }
