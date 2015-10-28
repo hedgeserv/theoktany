@@ -12,6 +12,10 @@ __all__ = ['ApiClient', ]
 
 
 class ApiClient(object):
+    """Client for making requests to OKTA API.
+    When creating an ApiClient, you can pass any settings that you wish to override from the defaults. See the settings
+    documentation for more information.
+    """
 
     def __init__(self, **kwargs):
         self.settings = settings
@@ -53,3 +57,29 @@ class ApiClient(object):
             return response_dict, response.status_code
         except ValueError:
             raise ApiException('Response was invalid.')
+
+    @staticmethod
+    def check_api_response(response, status_code, acceptable_status_codes=None):
+        """Make sure that the API response was what was expected.
+
+        :param response: the response to the web request
+        :type response: dict
+        :param status_code: the returned status code of the web request
+        :type status_code: int
+        :param acceptable_status_codes: a list of acceptable status codes (defaults to only 200)
+        :type acceptable_status_codes: list
+        :raises: ApiException
+        """
+
+        if acceptable_status_codes is None:
+            acceptable_status_codes = [200, ]
+
+        if status_code not in acceptable_status_codes:
+            if 'errorCauses' in response:
+                if response['errorCauses']:
+                    msg = response['errorCauses'][0]['errorSummary']
+                else:
+                    msg = response['errorSummary']
+            else:
+                msg = 'Okta returned {}.'.format(status_code)
+            raise ApiException(msg)

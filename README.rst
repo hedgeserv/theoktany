@@ -1,7 +1,7 @@
-theoktany
+Theoktany
 =========
 
-Library for interacting with OKTA
+OKTA API Wrapper
 
 ----
 

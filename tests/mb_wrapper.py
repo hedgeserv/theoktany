@@ -33,7 +33,12 @@ class MountebankProcess(object):
         # give mb some time to spin up and open its ports
         sleep(2)
         if self.mb_proc.poll() is not None:
-            raise Exception('Mountebank did not start properly (is it installed and linked to your PATH?).')
+            raise Exception(
+                'Mountebank did not start properly. Make sure that it installed and linked to your PATH. '
+                'If Mountebank is running, please terminate the process and retry running the tests.')
+
+    def is_running(self):
+        return self.mb_proc.poll() is None
 
     def create_imposter(self, stub_filename, port=5555):
         imposter = self.create_stubs(stub_filename, port=port)

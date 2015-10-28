@@ -17,7 +17,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='sample',
+    name='Theoktany',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
@@ -80,7 +80,7 @@ setup(
     # for example:
     # $ pip install -e .[dev,test]
     extras_require={
-        'dev': ['check-manifest'],
+        'dev': ['check-manifest', 'sphinx'],
         'test': ['coverage', 'unittest'],
     },
 
