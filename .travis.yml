@@ -1,8 +1,13 @@
 language: python
 python: 
   - "3.5"
-install: "pip install -e .[dev,test]"
-script: "cd tests && PYTHONPATH=..:$PYTHONPATH python runtests.py"
+install:
+  - "pip install -e .[dev,test]"
+  - "pip install coveralls"
+  
+script: "cd tests && PYTHONPATH=..:$PYTHONPATH coverage run --source=theocktany runtests.py"
+after_success:
+  coveralls
 before_install:
   - wget https://s3.amazonaws.com/mountebank/v1.4/mountebank_1.4.1_amd64.deb
   - sudo dpkg -i mountebank_1.4.1_amd64.deb
