@@ -3,16 +3,11 @@ import os
 from . import global_settings
 
 
-# TODO: shair: This will probably need to be expanded in the future
 class LazySettings(object):
     """Get a setting either from an environment variable or the global settings"""
 
-    def __init__(self, **kwargs):
+    def __init__(self):
         self._instance_settings = {}
-
-        # this will put values into _instance_settings
-        for key, value in kwargs.items():
-            self._instance_settings['key'] = value
 
     def set(self, item, value):
         self._instance_settings[item] = value

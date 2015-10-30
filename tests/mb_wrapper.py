@@ -15,6 +15,7 @@ IMPOSTERS_URL = MOUNTEBANK_URL + '/imposters'
 
 
 class MountebankProcess(object):
+    """Wrapper for Mountebank"""
     def __init__(self):
         self.mb_proc = None
         self.imposters = []
@@ -23,17 +24,22 @@ class MountebankProcess(object):
     def url(self):
         return MOUNTEBANK_URL
 
-    def get_imposter_url(self, port):
+    @staticmethod
+    def get_imposter_url(port):
         return '{}:{}'.format(MOUNTEBANK_HOST, port)
 
     def start(self):
-        # TODO: shair: mb is not starting correctly
         self.mb_proc = Popen(
-            'mb start', shell=True, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=None)
+            'mb start', shell=True, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=False)
         # give mb some time to spin up and open its ports
         sleep(2)
         if self.mb_proc.poll() is not None:
-            raise Exception('Mountebank did not start properly (is it installed and linked to your PATH?).')
+            raise Exception(
+                'Mountebank did not start properly. Make sure that it installed and linked to your PATH. '
+                'If Mountebank is running, please terminate the process and retry running the tests.')
+
+    def is_running(self):
+        return self.mb_proc.poll() is None
 
     def create_imposter(self, stub_filename, port=5555):
         imposter = self.create_stubs(stub_filename, port=port)
@@ -53,7 +59,8 @@ class MountebankProcess(object):
             pass
         return requests.delete("{}/imposters/:{}".format(MOUNTEBANK_HOST, port))
 
-    def destroy_all_imposters(self):
+    @staticmethod
+    def destroy_all_imposters():
         return requests.delete(IMPOSTERS_URL, verify=False)
 
     def stop(self):
@@ -65,7 +72,8 @@ class MountebankProcess(object):
 
         return return_code
 
-    def create_stubs(self, stub_filename, port=5555, name='imposter'):
+    @staticmethod
+    def create_stubs(stub_filename, port=5555, name='imposter'):
         # shamelessly stolen from Tim and grid-webapp-client, then slightly modified somewhat modified
         absolute_path = os.path.join(os.path.dirname(__file__), stub_filename)
         with open(absolute_path, 'r') as stub_file:
@@ -73,7 +81,12 @@ class MountebankProcess(object):
 
         # We store the body as JSON in the files for legibility but Mountebank wants the body as a string.
         for stub in stubs:
+            for predicate in stub['predicates']:
+                if 'contains' in predicate:
+                    predicate['contains']['body'] = json.dumps(predicate['contains']['body'])
             for response in stub['responses']:
-                response['is']['body'] = json.dumps(response['is']['body'])
+                if 'is' in response:
+                    if 'body' in response['is']:
+                        response['is']['body'] = json.dumps(response['is']['body'])
 
         return {"port": port, "protocol": PROTOCOL, "name": name, "stubs": stubs}

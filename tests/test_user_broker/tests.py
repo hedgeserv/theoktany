@@ -1,7 +1,7 @@
 import unittest
-from theocktany.user_broker import UserBroker
-from theocktany.client import ApiClient
 
+from theoktany.user_broker import UserBroker
+from theoktany.client import ApiClient
 from tests.mb_wrapper import MountebankProcess
 
 MOUNTEBANK_URL = "localhost:2525"
