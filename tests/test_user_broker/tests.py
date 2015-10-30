@@ -6,28 +6,28 @@ from tests.mb_wrapper import MountebankProcess
 
 MOUNTEBANK_URL = "localhost:2525"
 
-new_user_without_phone_number = {
+user_one = {
     "id": None,
     "login": "maury@aol.com",
-    "mobilePhone": None
+    "phone": None
 }
 
-new_user_with_phone_number = {
+user_two = {
     "id": None,
     "login": "gary@aol.com",
-    "mobilePhone": "234-567-8901"
+    "phone": "234-567-8901"
 }
 
-existing_user_with_id = {
+user_three = {
     "id": "00001",
     "login": "dave@aol.com",
-    "mobilePhone": "123-456-7890"
+    "phone": "123-456-7890"
 }
 
-existing_user_without_id = {
+user_four = {
     "id": None,
     "login": "harry@aol.com",
-    "mobilePhone": "234-567-8901"
+    "phone": "345-6789-0123"
 }
 
 
@@ -41,36 +41,32 @@ class TestUserBroker(unittest.TestCase):
         self.mb.destroy_all_imposters()
 
     def test_create_new_user_with_invalid_data(self):
-        response = self.broker.upsert_user({})
-        self.assertEqual(response, 'Invalid user data')
-
-    def test_create_new_user_with_missing_data(self):
-        response = self.broker.upsert_user(new_user_without_phone_number)
+        response = self.broker.upsert_user(user_one.get('id'), user_one.get('login'), user_one.get('phone'))
         self.assertEqual(response, 'Invalid user data')
 
     def test_create_new_user_with_valid_data(self):
         self.setup_imposter('create_new_user.json')
-        user, status_code = self.broker.upsert_user(new_user_with_phone_number)
-
-        self.assertEqual(user['profile']['login'], new_user_with_phone_number['login'])
+        user, code = self.broker.upsert_user(user_two.get('id'), user_two.get('login'), user_two.get('phone'))
+        self.assertEqual(code, 200)
         self.assertEqual(user['id'], "00002")
-        self.assertEqual(status_code, 200)
+        self.assertEqual(user['profile']['login'], user_two.get('login'))
+        self.assertEqual(user['profile']['mobilePhone'], user_two.get('phone'))
 
     def test_update_existing_user_with_id(self):
         self.setup_imposter('update_existing_user.json')
-        user, status_code = self.broker.upsert_user(existing_user_with_id)
-
-        self.assertEqual(user['profile']['login'], existing_user_with_id['login'])
-        self.assertEqual(user['id'], existing_user_with_id['id'])
-        self.assertEqual(status_code, 200)
+        user, code = self.broker.upsert_user(user_three.get('id'), user_three.get('login'), user_three.get('phone'))
+        self.assertEqual(code, 200)
+        self.assertEqual(user['id'], user_three.get('id'))
+        self.assertEqual(user['profile']['login'], user_three.get('login'))
+        self.assertEqual(user['profile']['mobilePhone'], user_three.get('phone'))
 
     def test_update_existing_user_without_id(self):
         self.setup_imposter('update_existing_user.json')
-        user, status_code = self.broker.upsert_user(existing_user_without_id)
-
-        self.assertEqual(user['profile']['login'], existing_user_without_id['login'])
+        user, code = self.broker.upsert_user(user_four.get('id'), user_four.get('login'), user_four.get('phone'))
+        self.assertEqual(code, 200)
         self.assertEqual(user['id'], "00003")
-        self.assertEqual(status_code, 200)
+        self.assertEqual(user['profile']['login'], user_four.get('login'))
+        self.assertEqual(user['profile']['mobilePhone'], user_four.get('phone'))
 
     def setup_imposter(self, file_name):
         file_path = 'test_user_broker/stubs/' + file_name

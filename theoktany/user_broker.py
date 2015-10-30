@@ -26,6 +26,13 @@ class UserBroker:
         response, status_code = self._api_client.post(route, user)
         return response, status_code
 
+    def create_user_dictionary(self, user_id, login, mobile_phone):
+        return {
+            "id": user_id,
+            "login": login,
+            "mobilePhone": mobile_phone
+        }
+
     def get_user(self, route, user_data):
         response, status_code = self._api_client.get(route)
 
@@ -45,7 +52,9 @@ class UserBroker:
         response, status_code = self._api_client.post(route, user)
         return response, status_code
 
-    def upsert_user(self, user_data):
+    def upsert_user(self, user_id, login, mobile_phone):
+        user_data = self.create_user_dictionary(user_id, login, mobile_phone)
+
         if not self.validate_user_data(user_data):
             return self.invalid_user_data()
 
