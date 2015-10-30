@@ -3,9 +3,13 @@ class UserBroker:
         self._api_client = api_client
         self.route = '/api/v1/users'
 
-    def create_profile_object_from_user_data(self, user_data):
+    def format_user_data_to_send(self, user_data):
         return {
-            "profile": user_data['profile']
+            "id": user_data.get('id'),
+            "profile": {
+                "login": user_data.get('login'),
+                "mobilePhone": user_data.get('mobilePhone')
+            }
         }
 
     def create_get_user_path(self, user_login):
@@ -17,10 +21,9 @@ class UserBroker:
         return self.route + "/" + user_id
 
     def create_user(self, user_data):
-        user = self.create_profile_object_from_user_data(user_data)
+        user = self.format_user_data_to_send(user_data)
         route = self.route
         response, status_code = self._api_client.post(route, user)
-
         return response, status_code
 
     def get_user(self, route, user_data):
@@ -31,17 +34,15 @@ class UserBroker:
 
         user = response[0]
         user_data['id'] = user['id']
-
         return user_data
 
     def invalid_user_data(self):
         return 'Invalid user data'  # Need to handle error response
 
     def update_user(self, user_data):
-        user = self.create_profile_object_from_user_data(user_data)
+        user = self.format_user_data_to_send(user_data)
         route = self.create_update_user_path(user_data.get('id'))
         response, status_code = self._api_client.post(route, user)
-
         return response, status_code
 
     def upsert_user(self, user_data):
@@ -58,20 +59,8 @@ class UserBroker:
         if user_data.get('id'):
             return user_data
 
-        login = user_data['profile']['login']
-        route = self.create_get_user_path(login)
-
+        route = self.create_get_user_path(user_data.get('login'))
         return self.get_user(route, user_data)
 
     def validate_user_data(self, user_data):
-        try:
-            profile = user_data['profile']
-            first = profile['firstName']
-            last = profile['lastName']
-            email = profile['email']
-            login = profile['login']
-            phone = profile['mobilePhone']
-            if first and last and email and login and phone:
-                return True
-        except KeyError:
-            return False
+        return user_data.get('login') and user_data.get('mobilePhone')
