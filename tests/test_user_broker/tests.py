@@ -54,10 +54,7 @@ existing_user_without_id = {
 class TestUserBroker(unittest.TestCase):
     def setUp(self):
         self.mb = MountebankProcess()
-
-        imposter = self.mb.create_imposter('test_user_broker/stubs/test_create_or_update_user_with_valid_credentials.json')
-        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
-
+        api_client = ApiClient()
         self.broker = UserBroker(api_client)
 
     def tearDown(self):
@@ -68,6 +65,7 @@ class TestUserBroker(unittest.TestCase):
         self.assertEqual(response, 'Invalid user data')
 
     def test_create_new_user_with_valid_credentials(self):
+        self.setup_imposter('create_new_user.json')
         user, status_code = self.broker.upsert_user(new_user_with_phone_number)
 
         self.assertEqual(user['profile']['login'], new_user_with_phone_number['profile']['login'])
@@ -75,6 +73,7 @@ class TestUserBroker(unittest.TestCase):
         self.assertEqual(status_code, 200)
 
     def test_update_existing_user_with_id(self):
+        self.setup_imposter('update_existing_user.json')
         user, status_code = self.broker.upsert_user(existing_user_with_id)
 
         self.assertEqual(user['profile']['login'], existing_user_with_id['profile']['login'])
@@ -82,11 +81,18 @@ class TestUserBroker(unittest.TestCase):
         self.assertEqual(status_code, 200)
 
     def test_update_existing_user_without_id(self):
+        self.setup_imposter('update_existing_user.json')
         user, status_code = self.broker.upsert_user(existing_user_without_id)
 
         self.assertEqual(user['profile']['login'], existing_user_without_id['profile']['login'])
         self.assertEqual(user['id'], "00003")
         self.assertEqual(status_code, 200)
+
+    def setup_imposter(self, file_name):
+        file_path = 'test_user_broker/stubs/' + file_name
+        imposter = self.mb.create_imposter(file_path)
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        self.broker = UserBroker(api_client)
 
 
 if __name__ == '__main__':
