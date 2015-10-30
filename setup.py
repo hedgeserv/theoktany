@@ -80,8 +80,8 @@ setup(
     # for example:
     # $ pip install -e .[dev,test]
     extras_require={
-        'dev': ['check-manifest', 'sphinx'],
-        'test': ['coverage', 'unittest'],
+        'dev': ['check-manifest'],
+        'test': ['coverage'],
     },
 
     # If there are data files included in your packages that need to be
