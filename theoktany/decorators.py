@@ -1,4 +1,4 @@
-from theocktany.user import User
+from theoktany.user import User
 
 
 def _simple_decorator(decorator):

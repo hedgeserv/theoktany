@@ -2,11 +2,9 @@
 
 import requests
 
-from theocktany.conf import settings
-from theocktany.exceptions import (
-    ApiException,
-    SerializerException,
-)
+from theoktany.conf import settings
+from theoktany.exceptions import ApiException
+from theoktany.serializers import deserialize
 
 __all__ = ['ApiClient', ]
 
@@ -14,8 +12,7 @@ __all__ = ['ApiClient', ]
 class ApiClient(object):
     """Client for making requests to OKTA API.
     When creating an ApiClient, you can pass any settings that you wish to override from the defaults. See the settings
-    documentation for more information.
-    """
+    documentation for more information."""
 
     def __init__(self, **kwargs):
         self.settings = settings
@@ -36,40 +33,28 @@ class ApiClient(object):
     def _base_url(self):
         return self.settings.get('BASE_URL')
 
+    @staticmethod
+    def _process_response(response):
+        """Do things with the response from requests"""
+        if response is None:
+            return None, None
+        try:
+            response_dict = deserialize(response.content)
+            return response_dict, response.status_code
+        except ValueError:
+            raise ApiException('Response was invalid.')
+
     def get(self, path, params=None):
         response = requests.get(self._base_url+path, params=params, headers=self._headers)
-
-        if response is None:
-            raise ApiException('No response received.')
-        try:
-            response_dict = response.json()
-            return response_dict, response.status_code
-        except ValueError:
-            raise ApiException('Response was invalid.')
+        return self._process_response(response)
 
     def post(self, path, data=None):
-        response = requests.post(self._base_url+path, json=data, headers=self._headers)
-
-        if response is None:
-            raise ApiException('No response received.')
-        try:
-            response_dict = response.json()
-            return response_dict, response.status_code
-        except ValueError:
-            raise ApiException('Response was invalid.')
+        response = requests.post(self._base_url+path, data=data, headers=self._headers)
+        return self._process_response(response)
 
     @staticmethod
     def check_api_response(response, status_code, acceptable_status_codes=None):
-        """Make sure that the API response was what was expected.
-
-        :param response: the response to the web request
-        :type response: dict
-        :param status_code: the returned status code of the web request
-        :type status_code: int
-        :param acceptable_status_codes: a list of acceptable status codes (defaults to only 200)
-        :type acceptable_status_codes: list
-        :raises: ApiException
-        """
+        """Make sure that the API response was what was expected."""
 
         if acceptable_status_codes is None:
             acceptable_status_codes = [200, ]

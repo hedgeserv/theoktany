@@ -1,29 +1,17 @@
 """Wrapper for OKTA authentication calls"""
-from theocktany.decorators import verify_user_id, verify_user_phone_number
-from theocktany.exceptions import EnrollmentException
-from theocktany.serializers import serialize
+from theoktany.decorators import verify_user_id, verify_user_phone_number
+from theoktany.exceptions import EnrollmentException
+from theoktany.serializers import serialize
 
 
 class OktaAuthClient(object):
-    """Client for interacting with OKTA's authentication system
-
-    :param api_client: the base API client
-    :type api_client: theocktany.ApiClient
-    """
+    """Client for interacting with OKTA's authentication system"""
 
     def __init__(self, api_client):
         self._api_client = api_client
 
     def _get_factor_id(self, user_id, factor_type="sms"):
-        """Get the OKTA MFA factor ID
-
-        :param user_id: OKTA id of the user
-        :type user_id: str
-        :param factor_type: name of the OKTA factor type
-        :type factor_type: str
-        :return: the factor id as a string
-        :raises: ApiException, EnrollmentException
-        """
+        """Get the OKTA MFA factor ID"""
 
         response, status_code = self._api_client.get('/api/v1/users/{}/factors'.format(user_id))
 
@@ -38,13 +26,7 @@ class OktaAuthClient(object):
     @verify_user_id
     @verify_user_phone_number
     def enroll_user_for_sms(self, user):
-        """Begin user enrollment process for SMS multi-factor authentication.
-
-        :param user: user object
-        :type user: theocktany.User
-        :raises: ValueError, ApiException
-
-        """
+        """Begin user enrollment process for SMS multi-factor authentication."""
 
         data = {
             "factorType": "sms",
@@ -60,14 +42,7 @@ class OktaAuthClient(object):
 
     @verify_user_id
     def activate_sms_factor(self, user, passcode):
-        """Activate the SMS authentication factor for a user.
-
-        :param user: user object
-        :type user: theocktany.User
-        :param passcode: the SMS passcode received by the user
-        :type passcode: str
-        :raises: ValueError, ApiException
-        """
+        """Activate the SMS authentication factor for a user."""
 
         factor_id = self._get_factor_id(user.id, 'sms')
 
@@ -79,12 +54,7 @@ class OktaAuthClient(object):
 
     @verify_user_id
     def send_sms_challenge(self, user):
-        """Send the SMS challenge to the user enrolled in SMS MFA.
-
-        :param user: user object
-        :type user: theocktany.User
-        :raises: ValueError, ApiException
-        """
+        """Send the SMS challenge to the user enrolled in SMS MFA."""
 
         factor_id = self._get_factor_id(user.id, 'sms')
 
@@ -94,14 +64,7 @@ class OktaAuthClient(object):
 
     @verify_user_id
     def verify_sms_challenge_passcode(self, user, passcode):
-        """Verify that the user received the correct passcode.
-
-        :param user: user object
-        :type user: theocktany.User
-        :param passcode: the SMS passcode received by the user
-        :type passcode: str
-        :raises: ValueError, ApiException
-        """
+        """Verify that the user received the correct passcode."""
 
         factor_id = self._get_factor_id(user.id, 'sms')
 

@@ -31,6 +31,13 @@
         "equals": {
           "path": "/api/v1/users/00u15s1KDETTQMQYABRL/factors/sms58q11w81MuAsyK0h7/verify"
         }
+      },
+      {
+        "contains": {
+          "body": {
+            "passCode": "123456"
+          }
+        }
       }
     ],
     "responses": [
@@ -112,6 +119,43 @@
               }
             }
           ]
+        }
+      }
+    ]
+  },
+  {
+    "predicates": [
+      {
+        "equals": {
+          "path": "/api/v1/users/00u15s1KDETTQMQYABRL/factors/sms58q11w81MuAsyK0h7/verify"
+        }
+      },
+      {
+        "contains": {
+          "body": {
+            "passCode": "invalid-passcode"
+          }
+        }
+      }
+    ],
+    "responses": [
+      {
+        "is": {
+          "statusCode": 403,
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "errorCode": "E0000068",
+            "errorSummary": "Invalid Passcode/Answer",
+            "errorLink": "E0000068",
+            "errorId": "oaei_IfXcpnTHit_YEKGInpFw",
+            "errorCauses": [
+              {
+                "errorSummary": "Your passcode doesn't match our records. Please try again."
+              }
+            ]
+          }
         }
       }
     ]

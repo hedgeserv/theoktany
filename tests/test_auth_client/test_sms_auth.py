@@ -1,9 +1,9 @@
 import unittest
 
-from theocktany.auth_client import OktaAuthClient
-from theocktany.client import ApiClient
-from theocktany.exceptions import ApiException, EnrollmentException
-from theocktany.user import User
+from theoktany.auth_client import OktaAuthClient
+from theoktany.client import ApiClient
+from theoktany.exceptions import ApiException, EnrollmentException
+from theoktany.user import User
 
 from tests.mb_wrapper import MountebankProcess
 
@@ -36,8 +36,8 @@ class SMSAuthTests(unittest.TestCase):
     def test_sms_enrollment(self):
         """Ensure whether we are receiving proper response from OKTA"""
 
-        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth.json')
-        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_enrollment.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter), API_TOKEN='dummy')
         auth_client = OktaAuthClient(api_client)
 
         try:
@@ -50,10 +50,10 @@ class SMSAuthTests(unittest.TestCase):
 
     def test_sms_enrollment_invalid_user_id(self):
         """Ensure whether proper error is thrown if invalid user id is passed"""
-        # TODO: shair: look into matching POST data so that we can us the test_sms_auth.json predicate
+        # TODO: shair: look into matching POST data so that we can us the test_sms_activation.json predicate
 
-        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_invalid_user_id.json')
-        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_enrollment.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter), API_TOKEN='dummy')
         auth_client = OktaAuthClient(api_client)
 
         self.user.id = 'invalid_id'
@@ -64,10 +64,10 @@ class SMSAuthTests(unittest.TestCase):
 
     def test_sms_enrollment_invalid_phone_number(self):
         """Ensure whether proper error is thrown if invalid phone number is passed"""
-        # TODO: shair: look into matching POST data so that we can us the test_sms_auth.json predicate
+        # TODO: shair: look into matching POST data so that we can us the test_sms_activation.json predicate
 
-        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_invalid_phone_number.json')
-        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_enrollment.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter), API_TOKEN='dummy')
         auth_client = OktaAuthClient(api_client)
 
         self.user.phone_number = 'invalid_phone_number'
@@ -88,8 +88,8 @@ class SMSAuthTests(unittest.TestCase):
     def test_sms_activation_invalid_user_id(self):
         """Ensure whether proper error is thrown if invalid user id is passed during activation"""
 
-        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_invalid_user_id.json')
-        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_activation.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter), API_TOKEN='dummy')
         auth_client = OktaAuthClient(api_client)
 
         self.user.id = 'invalid_id'
@@ -101,11 +101,12 @@ class SMSAuthTests(unittest.TestCase):
     def test_sms_activation_user_not_enrolled(self):
         """Testing SMS factor activation for a user that isn't enrolled in sms authentication"""
 
-        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_user_not_enrolled.json')
-        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_activation.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter), API_TOKEN='dummy')
         auth_client = OktaAuthClient(api_client)
 
         try:
+            self.user.id = 'not-enrolled-in-sms'
             auth_client.activate_sms_factor(self.user, "123456")
             raise AssertionError("User was enrolled and shouldn't have been")
         except EnrollmentException as err:
@@ -114,12 +115,12 @@ class SMSAuthTests(unittest.TestCase):
     def test_sms_activation_invalid_passcode(self):
         """Ensure that error is thrown if an invalid passcode is passed"""
 
-        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_invalid_passcode.json')
-        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_activation.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter), API_TOKEN='dummy')
         auth_client = OktaAuthClient(api_client)
 
         try:
-            auth_client.activate_sms_factor(self.user, '123456')
+            auth_client.activate_sms_factor(self.user, 'invalid-passcode')
             raise AssertionError("Passcode was valid and shouldn't have been")
         except ApiException as err:
             self.assertIn("passcode doesn't match our records", str(err))
@@ -127,8 +128,8 @@ class SMSAuthTests(unittest.TestCase):
     def test_sms_activation(self):
         """Test passcode activation and ensure that a user cannot be activated twice"""
 
-        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_activation.json')
-        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_activation.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter), API_TOKEN='dummy')
         auth_client = OktaAuthClient(api_client)
 
         try:
@@ -152,8 +153,8 @@ class SMSAuthTests(unittest.TestCase):
             self.auth_client.send_sms_challenge(user_without_id)
 
     def test_send_sms_challenge_invalid_user_id(self):
-        imposter = self.mb.create_imposter('test_auth_client/stubs/test_send_sms_challenge_invalid_user_id.json')
-        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_send_sms_challenge.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter), API_TOKEN='dummy')
         auth_client = OktaAuthClient(api_client)
 
         self.user.id = 'invalid_id'
@@ -164,11 +165,12 @@ class SMSAuthTests(unittest.TestCase):
             self.assertIn('invalid_id', str(err))
 
     def test_send_sms_challenge_unenrolled_user(self):
-        imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_user_not_enrolled.json')
-        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_send_sms_challenge.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter), API_TOKEN='dummy')
         auth_client = OktaAuthClient(api_client)
 
         try:
+            self.user.id = 'not-enrolled-in-sms'
             auth_client.send_sms_challenge(self.user)
             raise AssertionError('User is enrolled and should not have been.')
         except EnrollmentException as err:
@@ -176,7 +178,7 @@ class SMSAuthTests(unittest.TestCase):
 
     def test_send_sms_challenge(self):
         imposter = self.mb.create_imposter('test_auth_client/stubs/test_send_sms_challenge.json')
-        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter), API_TOKEN='dummy')
         auth_client = OktaAuthClient(api_client)
 
         try:
@@ -195,7 +197,7 @@ class SMSAuthTests(unittest.TestCase):
 
     def test_verify_sms_challenge_invalid_user_id(self):
         imposter = self.mb.create_imposter('test_auth_client/stubs/test_verify_sms_challenge.json')
-        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter), API_TOKEN='dummy')
         auth_client = OktaAuthClient(api_client)
 
         self.user.id = 'invalid_id'
@@ -206,19 +208,19 @@ class SMSAuthTests(unittest.TestCase):
             self.assertIn('invalid_id', str(err))
 
     def test_verify_sms_challenge_invalid_passcode(self):
-        imposter = self.mb.create_imposter('test_auth_client/stubs/test_verify_invalid_sms_challenge_code.json')
-        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        imposter = self.mb.create_imposter('test_auth_client/stubs/test_verify_sms_challenge.json')
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter), API_TOKEN='dummy')
         auth_client = OktaAuthClient(api_client)
 
         try:
-            auth_client.verify_sms_challenge_passcode(self.user, '123456')
+            auth_client.verify_sms_challenge_passcode(self.user, 'invalid-passcode')
             raise AssertionError("Passcode was valid and shouldn't have been")
         except ApiException as err:
             self.assertIn("passcode doesn't match our records", str(err))
 
     def test_verify_sms_challenge(self):
         imposter = self.mb.create_imposter('test_auth_client/stubs/test_verify_sms_challenge.json')
-        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter), API_TOKEN='dummy')
         auth_client = OktaAuthClient(api_client)
 
         try:

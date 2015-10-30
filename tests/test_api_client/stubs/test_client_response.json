@@ -1,0 +1,21 @@
+[
+  {
+    "predicates": [
+      {
+        "equals": {
+          "path": "/non-json"
+        }
+      }
+    ],
+    "responses": [
+      {
+        "is": {
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": "<html><body><h1>Testing!</h1></body></html>"
+        }
+      }
+    ]
+  }
+]

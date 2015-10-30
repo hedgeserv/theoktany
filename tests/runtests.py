@@ -7,10 +7,7 @@ from tests.mb_wrapper import MountebankProcess
 
 
 def main():
-    # automatically discover tests
-    suite = unittest.TestLoader().discover('.')
-
-    # start mountebank, exit on failure
+    # start mountebank
     mb_proc = MountebankProcess()
     try:
         print('Starting mountebank...')
@@ -21,6 +18,8 @@ def main():
         print(err)
         print("We'll try to run the tests anyway, but no promises.")
 
+    # automatically discover tests
+    suite = unittest.TestLoader().discover('.')
     # run tests
     unittest.TextTestRunner().run(suite)
 
