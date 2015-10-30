@@ -38,11 +38,8 @@ class ApiClient(object):
         """Do things with the response from requests"""
         if response is None:
             return None, None
-        try:
-            response_dict = deserialize(response.content)
-            return response_dict, response.status_code
-        except ValueError:
-            raise ApiException('Response was invalid.')
+        response_dict = deserialize(response.content)
+        return response_dict, response.status_code
 
     def get(self, path, params=None):
         response = requests.get(self._base_url+path, params=params, headers=self._headers)

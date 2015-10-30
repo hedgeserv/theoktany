@@ -29,7 +29,7 @@ def verify_user_id(func):
                 if not arg.id:
                     raise ValueError(msg)
 
-        for arg in kwargs:
+        for arg in kwargs.values():
             if isinstance(arg, User):
                 if not arg.id:
                     raise ValueError(msg)
@@ -42,7 +42,7 @@ def verify_user_id(func):
 def verify_user_phone_number(func):
     """If the user's phone number is None, a ValueError is raised."""
 
-    msg = 'User must have an OKTA id.'
+    msg = 'User must have a phone number.'
 
     def verify_phone_number(*args, **kwargs):
         for arg in args:
@@ -50,7 +50,7 @@ def verify_user_phone_number(func):
                 if not arg.phone_number:
                     raise ValueError(msg)
 
-        for arg in kwargs:
+        for arg in kwargs.values():
             if isinstance(arg, User):
                 if not arg.phone_number:
                     raise ValueError(msg)

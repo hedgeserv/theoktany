@@ -10,6 +10,7 @@ import requests
 import theoktany
 from theoktany import ApiClient
 from theoktany.conf import settings
+from theoktany.exceptions import ApiException
 from tests.mb_wrapper import MountebankProcess
 
 
@@ -89,6 +90,49 @@ class TestResponses(unittest.TestCase):
         self.assertEqual('<html><body><h1>Testing!</h1></body></html>', response)
         response, _ = api_client.post('/non-json')
         self.assertEqual('<html><body><h1>Testing!</h1></body></html>', response)
+
+    def test_check_api_response_no_causes(self):
+        api_client = ApiClient()
+
+        err_msg = {
+            "errorSummary": "This is a short error message",
+            "errorCauses": []
+        }
+        try:
+            api_client.check_api_response(err_msg, 400)
+            raise AssertionError("check_api_response should have raised an exception and didn't.")
+        except ApiException as err:
+            self.assertIn(err_msg['errorSummary'], str(err))
+
+    def test_check_api_response_with_causes(self):
+        api_client = ApiClient()
+
+        err_msg = {
+            "errorSummary": "This is a short error message",
+            "errorCauses": [
+                {
+                    "errorSummary": "This is a more detailed error message"
+                },
+                {
+                    "errorSummary": "This is a second error"
+                }
+            ]
+        }
+        try:
+            api_client.check_api_response(err_msg, 400)
+            raise AssertionError("check_api_response should have raised an exception and didn't.")
+        except ApiException as err:
+            self.assertIn(err_msg['errorCauses'][0]['errorSummary'], str(err))
+
+    def test_check_api_response_without_okta_error(self):
+        """Ensure that an invalid response without an OKTA error gets handled properly"""
+
+        api_client = ApiClient()
+        try:
+            api_client.check_api_response({}, 400)
+            raise AssertionError("check_api_response should have raised an exception and didn't.")
+        except ApiException as err:
+            self.assertIn('Okta returned 400', str(err))
 
 
 if __name__ == '__main__':

@@ -27,11 +27,16 @@ class SMSAuthTests(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             self.auth_client.enroll_user_for_sms(user_without_id)
+        with self.assertRaises(ValueError):
+            self.auth_client.enroll_user_for_sms(user=user_without_id)
 
         user_without_phone_number = self.user
+        user_without_phone_number.id = 'something'
         user_without_phone_number.phone_number = None
         with self.assertRaises(ValueError):
-            self.auth_client.enroll_user_for_sms(user_without_id)
+            self.auth_client.enroll_user_for_sms(user_without_phone_number)
+        with self.assertRaises(ValueError):
+            self.auth_client.enroll_user_for_sms(user=user_without_phone_number)
 
     def test_sms_enrollment(self):
         """Ensure whether we are receiving proper response from OKTA"""
