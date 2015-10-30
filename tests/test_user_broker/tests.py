@@ -91,9 +91,7 @@ class TestUserBroker(unittest.TestCase):
     def setup_imposter(self, file_name):
         file_path = 'test_user_broker/stubs/' + file_name
         imposter = self.mb.create_imposter(file_path)
-        api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
-        self.broker = UserBroker(api_client)
-
+        self.broker._api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
 
 if __name__ == '__main__':
     unittest.main()
