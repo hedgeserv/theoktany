@@ -6,7 +6,7 @@ class ValidationTest(unittest.TestCase):
 
     def test_200(self):
         response = {"happy": "joy"}
-        self.assertTrue(validate(response, 200))
+        self.assertEqual(response, validate(response, 200))
 
 
     def test_sad_with_error(self):

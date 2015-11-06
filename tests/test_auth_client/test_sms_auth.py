@@ -1,9 +1,10 @@
 import unittest
 
-from theocktany.auth_client import OktaAuthClient
+from theocktany.auth_client import OktaAuthClient, OktaFactors
 from theocktany.client import ApiClient
 from theocktany.exceptions import ApiException, EnrollmentException
 from theocktany.user import User
+from theocktany import validate
 
 from tests.mb_wrapper import MountebankProcess
 
@@ -12,7 +13,7 @@ class SMSAuthTests(unittest.TestCase):
 
     def setUp(self):
         self.api_client = ApiClient()
-        self.auth_client = OktaAuthClient(self.api_client)
+        self.auth_client = OktaAuthClient(OktaFactors(self.api_client, validate))
         self.mb = MountebankProcess()
         self.user = User('John', 'Doe', 'jdoe@example.com', phone_number='+1-555-555-5555', id='00u15s1KDETTQMQYABRL')
 
@@ -38,7 +39,7 @@ class SMSAuthTests(unittest.TestCase):
 
         imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth.json')
         api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
-        auth_client = OktaAuthClient(api_client)
+        auth_client = OktaAuthClient(OktaFactors(api_client, validate))
 
         try:
             auth_client.enroll_user_for_sms(self.user)
@@ -54,7 +55,7 @@ class SMSAuthTests(unittest.TestCase):
 
         imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_invalid_user_id.json')
         api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
-        auth_client = OktaAuthClient(api_client)
+        auth_client = OktaAuthClient(OktaFactors(api_client, validate))
 
         self.user.id = 'invalid_id'
         try:
@@ -68,7 +69,7 @@ class SMSAuthTests(unittest.TestCase):
 
         imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_invalid_phone_number.json')
         api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
-        auth_client = OktaAuthClient(api_client)
+        auth_client = OktaAuthClient(OktaFactors(api_client, validate))
 
         self.user.phone_number = 'invalid_phone_number'
         try:
@@ -90,7 +91,7 @@ class SMSAuthTests(unittest.TestCase):
 
         imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_invalid_user_id.json')
         api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
-        auth_client = OktaAuthClient(api_client)
+        auth_client = OktaAuthClient(OktaFactors(api_client, validate))
 
         self.user.id = 'invalid_id'
         try:
@@ -103,7 +104,7 @@ class SMSAuthTests(unittest.TestCase):
 
         imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_user_not_enrolled.json')
         api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
-        auth_client = OktaAuthClient(api_client)
+        auth_client = OktaAuthClient(OktaFactors(api_client, validate))
 
         try:
             auth_client.activate_sms_factor(self.user, "123456")
@@ -116,7 +117,7 @@ class SMSAuthTests(unittest.TestCase):
 
         imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_invalid_passcode.json')
         api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
-        auth_client = OktaAuthClient(api_client)
+        auth_client = OktaAuthClient(OktaFactors(api_client, validate))
 
         try:
             auth_client.activate_sms_factor(self.user, '123456')
@@ -129,7 +130,7 @@ class SMSAuthTests(unittest.TestCase):
 
         imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_activation.json')
         api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
-        auth_client = OktaAuthClient(api_client)
+        auth_client = OktaAuthClient(OktaFactors(api_client, validate))
 
         try:
             auth_client.activate_sms_factor(self.user, '123456')
@@ -154,7 +155,7 @@ class SMSAuthTests(unittest.TestCase):
     def test_send_sms_challenge_invalid_user_id(self):
         imposter = self.mb.create_imposter('test_auth_client/stubs/test_send_sms_challenge_invalid_user_id.json')
         api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
-        auth_client = OktaAuthClient(api_client)
+        auth_client = OktaAuthClient(OktaFactors(api_client, validate))
 
         self.user.id = 'invalid_id'
         try:
@@ -166,7 +167,7 @@ class SMSAuthTests(unittest.TestCase):
     def test_send_sms_challenge_unenrolled_user(self):
         imposter = self.mb.create_imposter('test_auth_client/stubs/test_sms_auth_user_not_enrolled.json')
         api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
-        auth_client = OktaAuthClient(api_client)
+        auth_client = OktaAuthClient(OktaFactors(api_client, validate))
 
         try:
             auth_client.send_sms_challenge(self.user)
@@ -177,7 +178,7 @@ class SMSAuthTests(unittest.TestCase):
     def test_send_sms_challenge(self):
         imposter = self.mb.create_imposter('test_auth_client/stubs/test_send_sms_challenge.json')
         api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
-        auth_client = OktaAuthClient(api_client)
+        auth_client = OktaAuthClient(OktaFactors(api_client, validate))
 
         try:
             auth_client.send_sms_challenge(self.user)
@@ -196,7 +197,7 @@ class SMSAuthTests(unittest.TestCase):
     def test_verify_sms_challenge_invalid_user_id(self):
         imposter = self.mb.create_imposter('test_auth_client/stubs/test_verify_sms_challenge.json')
         api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
-        auth_client = OktaAuthClient(api_client)
+        auth_client = OktaAuthClient(OktaFactors(api_client, validate))
 
         self.user.id = 'invalid_id'
         try:
@@ -208,7 +209,7 @@ class SMSAuthTests(unittest.TestCase):
     def test_verify_sms_challenge_invalid_passcode(self):
         imposter = self.mb.create_imposter('test_auth_client/stubs/test_verify_invalid_sms_challenge_code.json')
         api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
-        auth_client = OktaAuthClient(api_client)
+        auth_client = OktaAuthClient(OktaFactors(api_client, validate))
 
         try:
             auth_client.verify_sms_challenge_passcode(self.user, '123456')
@@ -219,7 +220,7 @@ class SMSAuthTests(unittest.TestCase):
     def test_verify_sms_challenge(self):
         imposter = self.mb.create_imposter('test_auth_client/stubs/test_verify_sms_challenge.json')
         api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
-        auth_client = OktaAuthClient(api_client)
+        auth_client = OktaAuthClient(OktaFactors(api_client, validate))
 
         try:
             auth_client.verify_sms_challenge_passcode(self.user, '123456')
