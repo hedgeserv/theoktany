@@ -8,7 +8,7 @@ from unittest.mock import MagicMock
 import requests
 
 import theoktany
-from theoktany import ApiClient
+from theoktany.client import ApiClient
 from theoktany.conf import settings
 from theoktany.exceptions import ApiException
 from tests.mb_wrapper import MountebankProcess

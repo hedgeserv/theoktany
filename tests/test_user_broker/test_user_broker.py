@@ -6,29 +6,10 @@ from tests.mb_wrapper import MountebankProcess
 
 MOUNTEBANK_URL = "localhost:2525"
 
-user_one = {
-    "id": None,
-    "login": "maury@aol.com",
-    "phone": None
-}
-
-user_two = {
-    "id": None,
-    "login": "gary@aol.com",
-    "phone": "234-567-8901"
-}
-
-user_three = {
-    "id": "00001",
-    "login": "dave@aol.com",
-    "phone": "123-456-7890"
-}
-
-user_four = {
-    "id": None,
-    "login": "harry@aol.com",
-    "phone": "345-6789-0123"
-}
+user_one = dict(id=None, login="maury@aol.com", phone=None)
+user_two = dict(id=None, login="gary@aol.com", phone="234-567-8901")
+user_three = dict(id="00001", login="dave@aol.com", phone="123-456-7890")
+user_four = dict(id=None, login="harry@aol.com", phone="345-6789-0123")
 
 
 class TestUserBroker(unittest.TestCase):

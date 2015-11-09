@@ -1,73 +1,90 @@
-"""Wrapper for OKTA authentication calls"""
-from theoktany.decorators import disallow_none_args
-from theoktany.exceptions import EnrollmentException
 from theoktany.serializers import serialize
+from theoktany.validate import validate
+from theoktany.client import ApiClient
+
+class OktaFactors(object):
+    def __init__(self, api_client=ApiClient):
+        self._api_client = api_client
+
+    def get_factors(self, user_id):
+        return validate(*self._api_client.get('/api/v1/users/{}/factors'.format(user_id)))
+
+    def filter_by_type(self, factors, factor_type="sms"):
+        return [factor for factor in factors if factor['factorType'] == factor_type]
+
+    def create_factor_object(self, user, factor_type="sms"):
+        return {
+            "factorType": factor_type,
+            "provider": "OKTA",
+            "profile": {
+                "phoneNumber": user.get('phone_number')
+            }
+        }
+
+    def call_with_correct_factor(self, v, user, factor_type):
+        factors, message = self.get_factors(user.get('id'))
+        if factors:
+            filtered_factors = self.filter_by_type(factors, factor_type)
+
+            if filtered_factors:
+                factor_id = filtered_factors[0]['id']
+                return v(factor_id)
+            else:
+                return False, "Not enrolled for SMS."
+
+        return False, message
+
+    def enroll(self, user, factor_type="sms"):
+        assert user.get('id')
+        assert user.get('phone_number')
+
+        data = self.create_factor_object(user, factor_type)
+        route = '/api/v1/users/{}/factors'.format(user.get('id'))
+        return validate(*self._api_client.post(route, data=serialize(data)))
+
+    def activate(self, user, pass_code, factor_type="sms"):
+        assert user.get('id')
+        assert pass_code
+
+        def v(factor_id):
+            route = '/api/v1/users/{}/factors/{}/lifecycle/activate'.format(user.get('id'), factor_id)
+            return validate(*self._api_client.post(route, data=serialize({'passCode': pass_code})))
+
+        return self.call_with_correct_factor(v, user, factor_type)
+
+    def challenge(self, user, factor_type="sms"):
+        assert user.get('id')
+
+        def v(factor_id):
+            route = '/api/v1/users/{}/factors/{}/verify'.format(user.get('id'), factor_id)
+            return validate(*self._api_client.post(route))
+
+        return self.call_with_correct_factor(v, user, factor_type)
+
+    def verify(self, user, pass_code, factor_type="sms"):
+        assert user.get('id')
+        assert pass_code
+
+        def v(factor_id):
+            route = '/api/v1/users/{}/factors/{}/verify'.format(user.get('id'), factor_id)
+            return validate(*self._api_client.post(route, data=serialize({'passCode': pass_code})))
+
+        return self.call_with_correct_factor(v, user, factor_type)
 
 
 class OktaAuthClient(object):
-    """Client for interacting with OKTA's authentication system"""
 
-    def __init__(self, api_client):
-        self._api_client = api_client
+    def __init__(self, factors):
+        self.factors = factors
 
-    def _get_factor_id(self, user_id, factor_type="sms"):
-        """Get the OKTA MFA factor ID"""
+    def enroll_user_for_sms(self, user):
+        return self.factors.enroll(user)
 
-        response, status_code = self._api_client.get('/api/v1/users/{}/factors'.format(user_id))
+    def activate_sms_factor(self, user, pass_code):
+        return self.factors.activate(user, pass_code)
 
-        self._api_client.check_api_response(response, status_code)
+    def send_sms_challenge(self, user):
+        return self.factors.challenge(user)
 
-        for factor in response:
-            if factor['factorType'] == factor_type:
-                return factor['id']
-        else:
-            raise EnrollmentException("User not associated with sms factor")
-
-    @disallow_none_args
-    def enroll_user_for_sms(self, user_id, phone_number):
-        """Begin user enrollment process for SMS multi-factor authentication."""
-
-        data = {
-            "factorType": "sms",
-            "provider": "OKTA",
-            "profile": {
-                "phoneNumber": phone_number
-            }
-        }
-        response, status_code = self._api_client.post(
-            '/api/v1/users/{}/factors'.format(user_id), data=serialize(data))
-
-        self._api_client.check_api_response(response, status_code)
-
-    @disallow_none_args
-    def activate_sms_factor(self, user_id, passcode):
-        """Activate the SMS authentication factor for a user."""
-
-        factor_id = self._get_factor_id(user_id, 'sms')
-
-        response, status_code = self._api_client.post(
-            '/api/v1/users/{}/factors/{}/lifecycle/activate'.format(user_id, factor_id),
-            data=serialize({'passCode': passcode}))
-
-        self._api_client.check_api_response(response, status_code)
-
-    @disallow_none_args
-    def send_sms_challenge(self, user_id):
-        """Send the SMS challenge to the user enrolled in SMS MFA."""
-
-        factor_id = self._get_factor_id(user_id, 'sms')
-
-        response, status_code = self._api_client.post('/api/v1/users/{}/factors/{}/verify'.format(user_id, factor_id))
-
-        self._api_client.check_api_response(response, status_code)
-
-    @disallow_none_args
-    def verify_sms_challenge_passcode(self, user_id, passcode):
-        """Verify that the user received the correct passcode."""
-
-        factor_id = self._get_factor_id(user_id, 'sms')
-
-        response, status_code = self._api_client.post(
-            '/api/v1/users/{}/factors/{}/verify'.format(user_id, factor_id), data=serialize({'passCode': passcode}))
-
-        self._api_client.check_api_response(response, status_code)
+    def verify_sms_challenge_passcode(self, user, pass_code):
+        return self.factors.verify(user, pass_code)
