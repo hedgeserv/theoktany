@@ -77,14 +77,17 @@ class OktaAuthClient(object):
     def __init__(self, factors):
         self.factors = factors
 
-    def enroll_user_for_sms(self, user):
-        return self.factors.enroll(user)
+    def enroll_user_for_sms(self, user_id, phone_number):
+        return self.factors.enroll(self.create_user_object(user_id, phone_number))
 
-    def activate_sms_factor(self, user, pass_code):
-        return self.factors.activate(user, pass_code)
+    def activate_sms_factor(self, user_id, phone_number, pass_code):
+        return self.factors.activate(self.create_user_object(user_id, phone_number), pass_code)
 
-    def send_sms_challenge(self, user):
-        return self.factors.challenge(user)
+    def send_sms_challenge(self, user_id, phone_number):
+        return self.factors.challenge(self.create_user_object(user_id, phone_number))
 
-    def verify_sms_challenge_passcode(self, user, pass_code):
-        return self.factors.verify(user, pass_code)
+    def verify_sms_challenge_passcode(self, user_id, phone_number, pass_code):
+        return self.factors.verify(self.create_user_object(user_id, phone_number), pass_code)
+
+    def create_user_object(self, user_id, phone_number):
+        return dict(id=user_id, phone_number=phone_number)

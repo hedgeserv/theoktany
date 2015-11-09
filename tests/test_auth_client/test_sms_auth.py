@@ -30,110 +30,110 @@ class SMSAuthTests(unittest.TestCase):
 
     def test_sms_enrollment_requirements(self):
         with self.assertRaises(AssertionError):
-            self.auth_client.enroll_user_for_sms(user_no_id)
+            self.auth_client.enroll_user_for_sms(user_no_id.get('id'), user_no_id.get('phone_number'))
 
         with self.assertRaises(AssertionError):
-            self.auth_client.enroll_user_for_sms(user_no_phone_number)
+            self.auth_client.enroll_user_for_sms(user_no_phone_number.get('id'), user_no_phone_number.get('phone_number'))
 
     def test_sms_enrollment_success(self):
         auth_client = self.setup_imposter('test_sms_enrollment.json')
-        response, message = auth_client.enroll_user_for_sms(user_one)
+        response, message = auth_client.enroll_user_for_sms(user_one.get('id'), user_one.get('phone_number'))
         self.assertTrue(response)
         self.assertEqual(response.get('id'), user_one.get('id'))
         self.assertEqual(message, "Success")
 
     def test_sms_enrollment_failure(self):
         auth_client = self.setup_imposter('test_sms_enrollment.json')
-        response, message = auth_client.enroll_user_for_sms(user_two)
+        response, message = auth_client.enroll_user_for_sms(user_two.get('id'), user_two.get('phone_number'))
         self.assertFalse(response)
         self.assertEqual(message, "Factor already exists.")
 
     def test_sms_activation_requirements(self):
         with self.assertRaises(AssertionError):
-            self.auth_client.activate_sms_factor(user_no_id, '123')
+            self.auth_client.activate_sms_factor(user_no_id.get('id'), user_no_id.get('phone_number'), '123')
 
         with self.assertRaises(AssertionError):
-            self.auth_client.activate_sms_factor(user_one, None)
+            self.auth_client.activate_sms_factor(user_one.get('id'), user_one.get('phone_number'), None)
 
     def test_sms_activation_success(self):
         auth_client = self.setup_imposter('test_sms_activation.json')
-        response, message = auth_client.activate_sms_factor(user_one, '12345')
+        response, message = auth_client.activate_sms_factor(user_one.get('id'), user_one.get('phone_number'), '12345')
         self.assertTrue(response)
         self.assertEqual(response.get('id'), user_one.get('id'))
         self.assertEqual(message, "Success")
 
     def test_sms_activation_failure_one(self):
         auth_client = self.setup_imposter('test_sms_activation.json')
-        response, message = auth_client.activate_sms_factor(user_two, 'invalid-passcode')
+        response, message = auth_client.activate_sms_factor(user_two.get('id'), user_two.get('phone_number'), 'invalid-passcode')
         self.assertFalse(response)
         self.assertEqual(message, "Your passcode doesn't match our records. Please try again.")
 
     def test_sms_activation_failure_two(self):
         auth_client = self.setup_imposter('test_sms_activation.json')
-        response, message = auth_client.activate_sms_factor(user_three, '12345')
+        response, message = auth_client.activate_sms_factor(user_three.get('id'), user_three.get('phone_number'), '12345')
         self.assertFalse(response)
         self.assertEqual(message, "Not enrolled for SMS.")
 
     def test_sms_activation_failure_three(self):
         auth_client = self.setup_imposter('test_sms_activation.json')
-        response, message = auth_client.activate_sms_factor(user_invalid_id, '12345')
+        response, message = auth_client.activate_sms_factor(user_invalid_id.get('id'), user_invalid_id.get('phone_number'), '12345')
         self.assertFalse(response)
         self.assertEqual(message, "Not found: Resource not found: invalid_id (User)")
 
     def test_sms_challenge_requirements(self):
         with self.assertRaises(AssertionError):
-            self.auth_client.send_sms_challenge(user_no_id)
+            self.auth_client.send_sms_challenge(user_no_id.get('id'), user_no_id.get('phone_number'))
 
     def test_sms_challenge_success(self):
         auth_client = self.setup_imposter('test_send_sms_challenge.json')
-        response, message = auth_client.send_sms_challenge(user_one)
+        response, message = auth_client.send_sms_challenge(user_one.get('id'), user_one.get('phone_number'))
         self.assertTrue(response)
         self.assertEqual(response.get('factorResult'), 'CHALLENGE')
         self.assertEqual(message, "Success")
 
     def test_sms_challenge_failure_one(self):
         auth_client = self.setup_imposter('test_send_sms_challenge.json')
-        response, message = auth_client.send_sms_challenge(user_two)
+        response, message = auth_client.send_sms_challenge(user_two.get('id'), user_two.get('phone_number'))
         self.assertFalse(response)
         self.assertEqual(message, "Your passcode doesn't match our records. Please try again.")
 
     def test_sms_challenge_failure_two(self):
         auth_client = self.setup_imposter('test_send_sms_challenge.json')
-        response, message = auth_client.send_sms_challenge(user_invalid_id)
+        response, message = auth_client.send_sms_challenge(user_invalid_id.get('id'), user_invalid_id.get('phone_number'))
         self.assertFalse(response)
         self.assertEqual(message, "Not found: Resource not found: invalid_id (User)")
 
     def test_sms_challenge_failure_three(self):
         auth_client = self.setup_imposter('test_send_sms_challenge.json')
-        response, message = auth_client.send_sms_challenge(user_three)
+        response, message = auth_client.send_sms_challenge(user_three.get('id'), user_three.get('phone_number'))
         self.assertFalse(response)
         self.assertEqual(message, "Not enrolled for SMS.")
 
     def test_verify_sms_challenge_requirements(self):
         with self.assertRaises(AssertionError):
-            self.auth_client.verify_sms_challenge_passcode(user_no_id, '12345')
+            self.auth_client.verify_sms_challenge_passcode(user_no_id.get('id'), user_no_id.get('phone_number'), '12345')
 
     def test_verify_sms_challenge_success(self):
         auth_client = self.setup_imposter('test_verify_sms_challenge.json')
-        response, message = auth_client.verify_sms_challenge_passcode(user_one, '12345')
+        response, message = auth_client.verify_sms_challenge_passcode(user_one.get('id'), user_one.get('phone_number'), '12345')
         self.assertTrue(response)
         self.assertEqual(response.get('factorResult'), 'SUCCESS')
         self.assertEqual(message, "Success")
 
     def test_verify_sms_challenge_failure_one(self):
         auth_client = self.setup_imposter('test_verify_sms_challenge.json')
-        response, message = auth_client.verify_sms_challenge_passcode(user_two, "invalid-passcode")
+        response, message = auth_client.verify_sms_challenge_passcode(user_two.get('id'), user_two.get('phone_number'), "invalid-passcode")
         self.assertFalse(response)
         self.assertEqual(message, "Your passcode doesn't match our records. Please try again.")
 
     def test_verify_sms_challenge_failure_two(self):
         auth_client = self.setup_imposter('test_verify_sms_challenge.json')
-        response, message = auth_client.verify_sms_challenge_passcode(user_invalid_id, '12345')
+        response, message = auth_client.verify_sms_challenge_passcode(user_invalid_id.get('id'), user_invalid_id.get('phone_number'), '12345')
         self.assertFalse(response)
         self.assertEqual(message, "Not found: Resource not found: invalid_id (User)")
 
     def test_verify_sms_challenge_three(self):
         auth_client = self.setup_imposter('test_verify_sms_challenge.json')
-        response, message = auth_client.verify_sms_challenge_passcode(user_three, '12345')
+        response, message = auth_client.verify_sms_challenge_passcode(user_three.get('id'), user_three.get('phone_number'), '12345')
         self.assertFalse(response)
         self.assertEqual(message, "Not enrolled for SMS.")
