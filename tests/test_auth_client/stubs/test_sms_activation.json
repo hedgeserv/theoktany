@@ -4,7 +4,7 @@
       {
         "equals": {
           "method": "GET",
-          "path": "/api/v1/users/00u15s1KDETTQMQYABRL/factors"
+          "path": "/api/v1/users/00001/factors"
         }
       }
     ],
@@ -16,172 +16,14 @@
           },
           "body": [
             {
-              "id": "sms58q11w81MuAsyK0h7",
+              "id": "sms00001",
               "factorType": "sms",
               "provider": "OKTA",
               "status": "PENDING_ACTIVATION",
               "created": "2014-08-05T20:59:49.000Z",
               "lastUpdated": "2014-08-06T03:59:49.000Z",
               "profile": {
-                "phoneNumber": "+1-555-415-1337"
-              },
-              "_links": {
-                "activate": {
-                  "href": "https://your-domain.okta.com/api/v1/users/00u15s1KDETTQMQYABRL/factors/mbl1nz9JHJGHWRKMTLHP/lifecycle/activate",
-                  "hints": {
-                    "allow": [
-                      "POST"
-                    ]
-                  }
-                },
-                "resend": [
-                  {
-                    "name": "sms",
-                    "href": "https://your-domain.okta.com/api/v1/users/00u15s1KDETTQMQYABRL/factors/mbl1nz9JHJGHWRKMTLHP/resend",
-                    "hints": {
-                      "allow": [
-                        "POST"
-                      ]
-                    }
-                  }
-                ],
-                "self": {
-                  "href": "https://your-domain.okta.com/api/v1/users/00u15s1KDETTQMQYABRL/factors/mbl1nz9JHJGHWRKMTLHP",
-                  "hints": {
-                    "allow": [
-                      "GET"
-                    ]
-                  }
-                },
-                "user": {
-                  "href": "https://your-domain.okta.com/api/v1/users/00u15s1KDETTQMQYABRL",
-                  "hints": {
-                    "allow": [
-                      "GET"
-                    ]
-                  }
-                }
-              }
-            }
-          ]
-        }
-      }
-    ]
-  },
-  {
-    "predicates": [
-      {
-        "equals": {
-          "path": "/api/v1/users/invalid_id/factors/mbl1nz9JHJGHWRKMTLHP/verify"
-        }
-      }
-    ],
-    "responses": [
-      {
-        "is": {
-          "statusCode": 404,
-          "headers": {
-            "Content-Type": "application/json"
-          },
-          "body": {
-            "errorCode": "E0000007",
-            "errorSummary": "Not found: Resource not found: invalid_id (User)",
-            "errorLink": "E0000007",
-            "errorCauses": [],
-            "errorId": "oaeinnziNStQHuDfv6ApTKCIg"
-          }
-        }
-      }
-    ]
-  },
-  {
-    "predicates": [
-      {
-        "equals": {
-          "path": "/api/v1/users/invalid_id/factors"
-        }
-      }
-    ],
-    "responses": [
-      {
-        "is": {
-          "statusCode": 404,
-          "headers": {
-            "Content-Type": "application/json"
-          },
-          "body": {
-            "errorCode": "E0000007",
-            "errorSummary": "Not found: Resource not found: invalid_id (User)",
-            "errorLink": "E0000007",
-            "errorCauses": [],
-            "errorId": "oaeinnziNStQHuDfv6ApTKCIg"
-          }
-        }
-      }
-    ]
-  },
-  {
-    "predicates": [
-      {
-        "equals": {
-          "method": "GET",
-          "path": "/api/v1/users/not-enrolled-in-sms/factors"
-        }
-      }
-    ],
-    "responses": [
-      {
-        "is": {
-          "headers": {
-            "Content-Type": "application/json"
-          },
-          "body": [
-            {
-              "id": "mbl1nz9JHJGHWRKMTLHP",
-              "factorType": "token:software:totp",
-              "provider": "OKTA",
-              "status": "PENDING_ACTIVATION",
-              "created": "2014-08-05T20:59:49.000Z",
-              "lastUpdated": "2014-08-06T03:59:49.000Z",
-              "profile": {
-                "phoneNumber": "+1-555-415-1337"
-              },
-              "_links": {
-                "activate": {
-                  "href": "https://your-domain.okta.com/api/v1/users/00u15s1KDETTQMQYABRL/factors/mbl1nz9JHJGHWRKMTLHP/lifecycle/activate",
-                  "hints": {
-                    "allow": [
-                      "POST"
-                    ]
-                  }
-                },
-                "resend": [
-                  {
-                    "name": "sms",
-                    "href": "https://your-domain.okta.com/api/v1/users/00u15s1KDETTQMQYABRL/factors/mbl1nz9JHJGHWRKMTLHP/resend",
-                    "hints": {
-                      "allow": [
-                        "POST"
-                      ]
-                    }
-                  }
-                ],
-                "self": {
-                  "href": "https://your-domain.okta.com/api/v1/users/00u15s1KDETTQMQYABRL/factors/mbl1nz9JHJGHWRKMTLHP",
-                  "hints": {
-                    "allow": [
-                      "GET"
-                    ]
-                  }
-                },
-                "user": {
-                  "href": "https://your-domain.okta.com/api/v1/users/00u15s1KDETTQMQYABRL",
-                  "hints": {
-                    "allow": [
-                      "GET"
-                    ]
-                  }
-                }
+                "phoneNumber": "+1-555-555-5555"
               }
             }
           ]
@@ -194,7 +36,76 @@
       {
         "equals": {
           "method": "POST",
-          "path": "/api/v1/users/00u15s1KDETTQMQYABRL/factors/sms58q11w81MuAsyK0h7/lifecycle/activate"
+          "path": "/api/v1/users/00001/factors/sms00001/lifecycle/activate"
+        }
+      },
+      {
+        "contains": {
+          "body": {
+            "passCode": "12345"
+          }
+        }
+      }
+    ],
+    "responses": [
+      {
+        "is": {
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "id": "00001",
+            "factorType": "sms",
+            "provider": "OKTA",
+            "status": "ACTIVE",
+            "created": "2014-08-05T20:59:49.000Z",
+            "lastUpdated": "2014-08-06T03:59:49.000Z",
+            "profile": {
+              "phoneNumber": "+1-555-555-5555"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "predicates": [
+      {
+        "equals": {
+          "method": "GET",
+          "path": "/api/v1/users/00002/factors"
+        }
+      }
+    ],
+    "responses": [
+      {
+        "is": {
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": [
+            {
+              "id": "sms00002",
+              "factorType": "sms",
+              "provider": "OKTA",
+              "status": "PENDING_ACTIVATION",
+              "created": "2014-08-05T20:59:49.000Z",
+              "lastUpdated": "2014-08-06T03:59:49.000Z",
+              "profile": {
+                "phoneNumber": "+1-555-555-5555"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "predicates": [
+      {
+        "equals": {
+          "method": "POST",
+          "path": "/api/v1/users/00002/factors/sms00002/lifecycle/activate"
         }
       },
       {
@@ -231,15 +142,8 @@
     "predicates": [
       {
         "equals": {
-          "method": "POST",
-          "path": "/api/v1/users/00u15s1KDETTQMQYABRL/factors/sms58q11w81MuAsyK0h7/lifecycle/activate"
-        }
-      },
-      {
-        "contains": {
-          "body": {
-            "passCode": "123456"
-          }
+          "method": "GET",
+          "path": "/api/v1/users/00003/factors"
         }
       }
     ],
@@ -249,71 +153,43 @@
           "headers": {
             "Content-Type": "application/json"
           },
-          "body": {
-            "id": "mbl1nz9JHJGHWRKMTLHP",
-            "factorType": "sms",
-            "provider": "OKTA",
-            "status": "ACTIVE",
-            "created": "2014-08-05T20:59:49.000Z",
-            "lastUpdated": "2014-08-06T03:59:49.000Z",
-            "profile": {
-              "phoneNumber": "+1-555-415-1337"
-            },
-            "_links": {
-              "activate": {
-                "href": "https://your-domain.okta.com/api/v1/users/00u15s1KDETTQMQYABRL/factors/mbl1nz9JHJGHWRKMTLHP/lifecycle/activate",
-                "hints": {
-                  "allow": [
-                    "POST"
-                  ]
-                }
-              },
-              "resend": [
-                {
-                  "name": "sms",
-                  "href": "https://your-domain.okta.com/api/v1/users/00u15s1KDETTQMQYABRL/factors/mbl1nz9JHJGHWRKMTLHP/resend",
-                  "hints": {
-                    "allow": [
-                      "POST"
-                    ]
-                  }
-                }
-              ],
-              "self": {
-                "href": "https://your-domain.okta.com/api/v1/users/00u15s1KDETTQMQYABRL/factors/mbl1nz9JHJGHWRKMTLHP",
-                "hints": {
-                  "allow": [
-                    "GET"
-                  ]
-                }
-              },
-              "user": {
-                "href": "https://your-domain.okta.com/api/v1/users/00u15s1KDETTQMQYABRL",
-                "hints": {
-                  "allow": [
-                    "GET"
-                  ]
-                }
+          "body": [
+            {
+              "id": "00003",
+              "factorType": "token:software:totp",
+              "provider": "OKTA",
+              "status": "PENDING_ACTIVATION",
+              "created": "2014-08-05T20:59:49.000Z",
+              "lastUpdated": "2014-08-06T03:59:49.000Z",
+              "profile": {
+                "phoneNumber": "+1-555-555-5555"
               }
             }
-          }
+          ]
         }
-      },
+      }
+    ]
+  },
+  {
+    "predicates": [
+      {
+        "equals": {
+          "path": "/api/v1/users/invalid_id/factors"
+        }
+      }
+    ],
+    "responses": [
       {
         "is": {
-          "statusCode": 400,
+          "statusCode": 404,
           "headers": {
             "Content-Type": "application/json"
           },
           "body": {
-            "errorCode": "E0000001",
-            "errorSummary": "Api validation failed: factorEnrollRequest",
-            "errorLink": "E0000001",
-            "errorCauses": [
-              {
-                "errorSummary": "Factor already exists."
-              }
-            ],
+            "errorCode": "E0000007",
+            "errorSummary": "Not found: Resource not found: invalid_id (User)",
+            "errorLink": "E0000007",
+            "errorCauses": [],
             "errorId": "oaeinnziNStQHuDfv6ApTKCIg"
           }
         }
@@ -321,3 +197,5 @@
     ]
   }
 ]
+
+
