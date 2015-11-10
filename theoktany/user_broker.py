@@ -12,11 +12,6 @@ class UserBroker:
             }
         }
 
-    def create_get_user_path(self, user_login):
-        filter_string = "filter=profile.login+eq+\"" + user_login + "\""
-        limit_string = 'limit=1'
-        return self.route + '?' + filter_string + '&' + limit_string
-
     def create_update_user_path(self, user_id):
         return self.route + "/" + user_id
 
@@ -33,15 +28,15 @@ class UserBroker:
             "mobilePhone": mobile_phone
         }
 
-    def get_user(self, route, user_data):
+    def get_user_id(self, user_login):
+        filter_string = "filter=profile.login+eq+\"" + user_login + "\"" + '&limit=1'
+        route = self.route + '?' + filter_string
+
         response, status_code = self._api_client.get(route)
 
         if not len(response) or not status_code == 200:
             return None
-
-        user = response[0]
-        user_data['id'] = user['id']
-        return user_data
+        return response[0]['id']
 
     def invalid_user_data(self):
         return 'Invalid user data'  # Need to handle error response
@@ -60,7 +55,7 @@ class UserBroker:
 
         user = self.user_exists(user_data)
 
-        if user:
+        if user.get('id'):
             return self.update_user(user)
         return self.create_user(user_data)
 
@@ -68,8 +63,8 @@ class UserBroker:
         if user_data.get('id'):
             return user_data
 
-        route = self.create_get_user_path(user_data.get('login'))
-        return self.get_user(route, user_data)
+        user_data['id'] = self.get_user_id(user_data.get('login'))
+        return user_data
 
     def validate_user_data(self, user_data):
         return user_data.get('login') and user_data.get('mobilePhone')
