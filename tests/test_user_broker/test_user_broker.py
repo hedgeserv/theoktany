@@ -22,12 +22,12 @@ class TestUserBroker(unittest.TestCase):
         self.mb.destroy_all_imposters()
 
     def test_create_new_user_with_invalid_data(self):
-        response = self.broker.upsert_user(user_one.get('id'), user_one.get('login'), user_one.get('phone'))
+        response = self.broker.upsert_user(user_one.get('login'), user_one.get('phone'), user_one.get('id'))
         self.assertEqual(response, 'Invalid user data')
 
     def test_create_new_user_with_valid_data(self):
         self.setup_imposter('create_new_user.json')
-        user, code = self.broker.upsert_user(user_two.get('id'), user_two.get('login'), user_two.get('phone'))
+        user, code = self.broker.upsert_user(user_two.get('login'), user_two.get('phone'), user_two.get('id'))
         self.assertEqual(code, 200)
         self.assertEqual(user['id'], "00002")
         self.assertEqual(user['profile']['login'], user_two.get('login'))
@@ -35,7 +35,7 @@ class TestUserBroker(unittest.TestCase):
 
     def test_update_existing_user_with_id(self):
         self.setup_imposter('update_existing_user.json')
-        user, code = self.broker.upsert_user(user_three.get('id'), user_three.get('login'), user_three.get('phone'))
+        user, code = self.broker.upsert_user(user_three.get('login'), user_three.get('phone'), user_three.get('id'))
         self.assertEqual(code, 200)
         self.assertEqual(user['id'], user_three.get('id'))
         self.assertEqual(user['profile']['login'], user_three.get('login'))
@@ -43,7 +43,7 @@ class TestUserBroker(unittest.TestCase):
 
     def test_update_existing_user_without_id(self):
         self.setup_imposter('update_existing_user.json')
-        user, code = self.broker.upsert_user(user_four.get('id'), user_four.get('login'), user_four.get('phone'))
+        user, code = self.broker.upsert_user(user_four.get('login'), user_four.get('phone'), user_four.get('id'))
         self.assertEqual(code, 200)
         self.assertEqual(user['id'], "00003")
         self.assertEqual(user['profile']['login'], user_four.get('login'))
