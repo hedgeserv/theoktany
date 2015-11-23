@@ -21,13 +21,6 @@ class UserBroker:
         response, status_code = self._api_client.post(route, user)
         return response, status_code
 
-    def create_user_dictionary(self, user_id, login, mobile_phone):
-        return {
-            "id": user_id,
-            "login": login,
-            "mobilePhone": mobile_phone
-        }
-
     def get_user_id(self, user_login):
         filter_string = "filter=profile.login+eq+\"" + user_login + "\"" + '&limit=1'
         route = self.route + '?' + filter_string
@@ -47,9 +40,7 @@ class UserBroker:
         response, status_code = self._api_client.post(route, user)
         return response, status_code
 
-    def upsert_user(self, login, mobile_phone, user_id=None):
-        user_data = self.create_user_dictionary(user_id, login, mobile_phone)
-
+    def upsert_user(self, user_data):
         if not self.validate_user_data(user_data):
             return self.invalid_user_data()
 
@@ -66,5 +57,9 @@ class UserBroker:
         user_data['id'] = self.get_user_id(user_data.get('login'))
         return user_data
 
-    def validate_user_data(self, user_data):
-        return user_data.get('login') and user_data.get('mobilePhone')
+    def validate_user_data(self, user):
+        fields = ['login', 'mobilePhone', 'firstName', 'lastName', 'email']
+        for field in fields:
+            if not user.get(field):
+                return False
+        return True
