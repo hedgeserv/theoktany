@@ -1,16 +1,22 @@
+import json
+
+
 class UserBroker:
     def __init__(self, api_client):
         self._api_client = api_client
         self.route = '/api/v1/users'
 
     def format_user_data_to_send(self, user_data):
-        return {
-            "id": user_data.get('id'),
+        return json.dumps({
+            "id": user_data.get('id') or "None",
             "profile": {
                 "login": user_data.get('login'),
-                "mobilePhone": user_data.get('mobilePhone')
+                "mobilePhone": user_data.get('mobilePhone'),
+                "firstName": user_data.get('firstName'),
+                "lastName": user_data.get('lastName'),
+                "email": user_data.get('email')
             }
-        }
+        })
 
     def create_update_user_path(self, user_id):
         return self.route + "/" + user_id
