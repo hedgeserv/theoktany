@@ -1,0 +1,127 @@
+[
+  {
+    "predicates": [
+      {
+        "equals": {
+          "method": "GET",
+          "path": "/api/v1/users/00001/factors"
+        }
+      }
+    ],
+    "responses": [
+      {
+        "is": {
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": [
+            {
+              "id": "sms00001",
+              "factorType": "sms",
+              "provider": "OKTA",
+              "status": "ACTIVE",
+              "created": "2014-08-05T20:59:49.000Z",
+              "lastUpdated": "2014-08-06T03:59:49.000Z",
+              "profile": {
+                "phoneNumber": "+1-555-555-5555"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+
+  {
+    "predicates": [
+      {
+        "equals": {
+          "method": "GET",
+          "path": "/api/v1/users/00002/factors"
+        }
+      }
+    ],
+    "responses": [
+      {
+        "is": {
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": [
+            {
+              "id": "sms00002",
+              "factorType": "sms",
+              "provider": "OKTA",
+              "status": "PENDING_ACTIVATION",
+              "created": "2014-08-05T20:59:49.000Z",
+              "lastUpdated": "2014-08-06T03:59:49.000Z",
+              "profile": {
+                "phoneNumber": "+1-555-555-5555"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+
+  {
+    "predicates": [
+      {
+        "equals": {
+          "path": "/api/v1/users/invalid_id/factors"
+        }
+      }
+    ],
+    "responses": [
+      {
+        "is": {
+          "statusCode": 404,
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "errorCode": "E0000007",
+            "errorSummary": "Not found: Resource not found: invalid_id (User)",
+            "errorLink": "E0000007",
+            "errorCauses": [],
+            "errorId": "oaeinnziNStQHuDfv6ApTKCIg"
+          }
+        }
+      }
+    ]
+  },
+
+  {
+    "predicates": [
+      {
+        "equals": {
+          "method": "GET",
+          "path": "/api/v1/users/00003/factors"
+        }
+      }
+    ],
+    "responses": [
+      {
+        "is": {
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": [
+            {
+              "id": "00003",
+              "factorType": "token:software:totp",
+              "provider": "OKTA",
+              "status": "PENDING_ACTIVATION",
+              "created": "2014-08-05T20:59:49.000Z",
+              "lastUpdated": "2014-08-06T03:59:49.000Z",
+              "profile": {
+                "phoneNumber": "+1-555-555-5555"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+]
