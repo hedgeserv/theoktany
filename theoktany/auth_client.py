@@ -21,6 +21,14 @@ class OktaFactors(object):
             }
         }
 
+    def is_enrolled(self, user_id, factor_type):
+        factors, message = self.get_factors(user_id)
+        if factors:
+            filtered_factors = self.filter_by_type(factors, factor_type)
+            if filtered_factors:
+                return True
+        return False
+
     def call_with_correct_factor(self, v, user_id, factor_type):
         factors, message = self.get_factors(user_id)
         if factors:
@@ -88,3 +96,6 @@ class OktaAuthClient(object):
 
     def verify_sms_challenge_passcode(self, user_id, pass_code):
         return self.factors.verify(user_id, pass_code)
+
+    def is_user_enrolled_for_sms(self, user_id):
+        return self.factors.is_enrolled(user_id, factor_type="sms")

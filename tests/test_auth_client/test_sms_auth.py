@@ -137,3 +137,13 @@ class SMSAuthTests(unittest.TestCase):
         response, message = auth_client.verify_sms_challenge_passcode(user_three.get('id'), '12345')
         self.assertFalse(response)
         self.assertEqual(message, "Not enrolled for SMS.")
+
+    def test_user_is_enrolled_in_sms(self):
+        auth_client = self.setup_imposter('test_verify_sms_challenge.json')
+        is_enrolled = auth_client.is_user_enrolled_for_sms(user_two.get('id'))
+        self.assertTrue(is_enrolled)
+
+    def test_user_is__not_enrolled_in_sms(self):
+        auth_client = self.setup_imposter('test_verify_sms_challenge.json')
+        is_enrolled = auth_client.is_user_enrolled_for_sms(user_three.get('id'))
+        self.assertFalse(is_enrolled)
