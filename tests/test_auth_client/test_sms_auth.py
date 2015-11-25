@@ -139,11 +139,21 @@ class SMSAuthTests(unittest.TestCase):
         self.assertEqual(message, "Not enrolled for SMS.")
 
     def test_user_is_enrolled_in_sms(self):
-        auth_client = self.setup_imposter('test_verify_sms_challenge.json')
-        is_enrolled = auth_client.is_user_enrolled_for_sms(user_two.get('id'))
+        auth_client = self.setup_imposter('test_sms_is_enrolled.json')
+        is_enrolled = auth_client.is_user_enrolled_for_sms(user_one.get('id'))
         self.assertTrue(is_enrolled)
 
-    def test_user_is__not_enrolled_in_sms(self):
-        auth_client = self.setup_imposter('test_verify_sms_challenge.json')
+    def test_user_is_not_enrolled_in_sms_pending_activation(self):
+        auth_client = self.setup_imposter('test_sms_is_enrolled.json')
+        is_enrolled = auth_client.is_user_enrolled_for_sms(user_two.get('id'))
+        self.assertFalse(is_enrolled)
+
+    def test_user_is_not_enrolled_in_sms_different_factor(self):
+        auth_client = self.setup_imposter('test_sms_is_enrolled.json')
         is_enrolled = auth_client.is_user_enrolled_for_sms(user_three.get('id'))
+        self.assertFalse(is_enrolled)
+
+    def test_user_is_not_enrolled_in_sms_invalid_id(self):
+        auth_client = self.setup_imposter('test_sms_is_enrolled.json')
+        is_enrolled = auth_client.is_user_enrolled_for_sms("invalid_id")
         self.assertFalse(is_enrolled)

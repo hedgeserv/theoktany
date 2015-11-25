@@ -25,7 +25,7 @@ class OktaFactors(object):
         factors, message = self.get_factors(user_id)
         if factors:
             filtered_factors = self.filter_by_type(factors, factor_type)
-            if filtered_factors:
+            if filtered_factors and filtered_factors[0]['status'] == 'ACTIVE':
                 return True
         return False
 
