@@ -7,6 +7,8 @@ class UserBroker:
         self.route = '/api/v1/users'
 
     def format_user_data_to_send(self, user_data):
+        if user_data.get('profile'):
+            return json.dumps(user_data)
         return json.dumps({
             "id": user_data.get('id') or "None",
             "profile": {
@@ -28,6 +30,12 @@ class UserBroker:
         return response, status_code
 
     def get_user_id(self, user_login):
+        user = self.get_user(user_login)
+        if user:
+            return user['id']
+        return None
+
+    def get_user(self, user_login):
         filter_string = "filter=profile.login+eq+\"" + user_login + "\"" + '&limit=1'
         route = self.route + '?' + filter_string
 
@@ -35,7 +43,7 @@ class UserBroker:
 
         if not len(response) or not status_code == 200:
             return None
-        return response[0]['id']
+        return response[0]
 
     def invalid_user_data(self):
         return 'Invalid user data'  # Need to handle error response
