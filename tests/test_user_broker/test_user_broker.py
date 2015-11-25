@@ -49,10 +49,20 @@ class TestUserBroker(unittest.TestCase):
         self.assertEqual(user['profile']['login'], user_four.get('login'))
         self.assertEqual(user['profile']['mobilePhone'], user_four.get('mobilePhone'))
 
+    def test_get_user_method(self):
+        self.setup_imposter('update_existing_user.json')
+        user = self.broker.get_user(user_four.get('login'))
+        self.assertEqual(user['profile']['login'], user_four.get('login'))
+
+    def test_get_user_id_method(self):
+        self.setup_imposter('update_existing_user.json')
+        user_id = self.broker.get_user_id(user_four.get('login'))
+        self.assertEqual(user_id, '00003')
+
     def setup_imposter(self, file_name):
         file_path = 'test_user_broker/stubs/' + file_name
         imposter = self.mb.create_imposter(file_path)
-        self.broker._api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter))
+        self.broker._api_client = ApiClient(BASE_URL=self.mb.get_imposter_url(imposter), API_TOKEN='1')
 
 if __name__ == '__main__':
     unittest.main()
