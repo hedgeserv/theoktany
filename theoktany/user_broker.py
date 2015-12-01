@@ -49,7 +49,9 @@ class UserBroker:
         user = self._format_user_data_to_send(user_data)
         route = self.route
         response, status_code = self._api_client.post(route, user)
-        return response, status_code
+
+        if len(response) and status_code in [200, 201]:
+            return self._format_user_data_received(response)
 
     def get_user_id(self, email):
         user = self.get_user(email)
