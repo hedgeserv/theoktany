@@ -31,7 +31,6 @@ class UserBroker:
         user = self.get_user(user_login)
         if user:
             return user['id']
-        return None
 
     def get_user(self, user_login):
         filter_string = "filter=profile.login+eq+\"" + user_login + "\"" + '&limit=1'
@@ -39,12 +38,8 @@ class UserBroker:
 
         response, status_code = self._api_client.get(route)
 
-        if not len(response) or not status_code == 200:
-            return None
-        return response[0]
-
-    def invalid_user_data(self):
-        return 'Invalid user data'  # Need to handle error response
+        if len(response) and status_code == 200:
+            return response[0]
 
     def update_user_phone_number(self, user_id, phone_number):
         assert user_id
@@ -54,13 +49,6 @@ class UserBroker:
         route = self.create_update_user_path(user_id)
         response, status_code = self._api_client.post(route, user)
         return response, status_code
-
-    def user_exists(self, user_data):
-        if user_data.get('id'):
-            return user_data
-
-        user_data['id'] = self.get_user_id(user_data.get('login'))
-        return user_data
 
     def validate_user_data(self, user):
         fields = ['login', 'mobilePhone', 'firstName', 'lastName', 'email']
