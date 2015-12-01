@@ -6,20 +6,13 @@ from tests.mb_wrapper import MountebankProcess
 
 MOUNTEBANK_URL = "localhost:2525"
 
-user_one = dict(id=None, login="maury@aol.com", email="maury@aol.com", mobilePhone=None, firstName='A', lastName='A')
-user_two = dict(id=None, login="gary@aol.com", email="gary@aol.com", mobilePhone="234-567-8901", firstName='A', lastName='A')
-user_three = dict(id="00001", login="dave@aol.com", email="dave@aol.com", mobilePhone="123-456-7890", firstName='A', lastName='A')
-user_four = dict(id=None, login="harry@aol.com", email="harry@aol.com", mobilePhone="345-6789-0123", firstName='A', lastName='A')
-user_three_okta_json = {
-    "id": user_three.get('id'),
-    "profile": {
-        "login": user_three.get('login'),
-        "mobilePhone": user_three.get('mobilePhone'),
-        "firstName": user_three.get('firstName'),
-        "lastName": user_three.get('lastName'),
-        "email": user_three.get('email')
-    }
-}
+user_one = dict(id=None, login="maury@aol.com", email="maury@aol.com", mobile_phone=None, first_name='A', last_name='A')
+user_two = dict(
+    id=None, login="gary@aol.com", email="gary@aol.com", mobile_phone="234-567-8901", first_name='A', last_name='A')
+user_three = dict(
+    id="00001", login="dave@aol.com", email="dave@aol.com", mobile_phone="123-456-7890", first_name='A', last_name='A')
+user_four = dict(
+    id=None, login="harry@aol.com", email="harry@aol.com", mobile_phone="345-6789-0123", first_name='A', last_name='A')
 
 
 class TestUserBroker(unittest.TestCase):
@@ -41,26 +34,26 @@ class TestUserBroker(unittest.TestCase):
         self.assertEqual(code, 200)
         self.assertEqual(user['id'], "00002")
         self.assertEqual(user['profile']['login'], user_two.get('login'))
-        self.assertEqual(user['profile']['mobilePhone'], user_two.get('mobilePhone'))
+        self.assertEqual(user['profile']['mobilePhone'], user_two.get('mobile_phone'))
 
     def test_update_existing_user_with_id(self):
         self.setup_imposter('update_existing_user.json')
-        user, code = self.broker.update_user_phone_number(user_three['id'], user_three['mobilePhone'])
-        self.assertEqual(code, 200)
+        user = self.broker.update_user_phone_number(user_three['id'], user_three['mobile_phone'])
+        self.assertIsNotNone(user)
         self.assertEqual(user['id'], user_three.get('id'))
-        self.assertEqual(user['profile']['login'], user_three.get('login'))
-        self.assertEqual(user['profile']['mobilePhone'], user_three.get('mobilePhone'))
+        self.assertEqual(user['login'], user_three.get('login'))
+        self.assertEqual(user['mobile_phone'], user_three.get('mobile_phone'))
 
     def test_update_existing_user_without_id_or_phone(self):
         with self.assertRaises(AssertionError):
-            user, code = self.broker.update_user_phone_number(user_four['id'], user_four['mobilePhone'])
+            self.broker.update_user_phone_number(user_two['id'], user_two['mobile_phone'])
         with self.assertRaises(AssertionError):
-            user, code = self.broker.update_user_phone_number(user_three['id'], None)
+            self.broker.update_user_phone_number(user_three['id'], None)
 
     def test_get_user_method(self):
         self.setup_imposter('update_existing_user.json')
         user = self.broker.get_user(user_four.get('login'))
-        self.assertEqual(user['profile']['login'], user_four.get('login'))
+        self.assertEqual(user['login'], user_four.get('login'))
 
     def test_get_user_id_method(self):
         self.setup_imposter('update_existing_user.json')

@@ -6,23 +6,47 @@ class UserBroker:
         self._api_client = api_client
         self.route = '/api/v1/users'
 
-    def format_user_data_to_send(self, user_data):
+    @staticmethod
+    def _format_user_data_to_send(user_data):
 
         user_dict = {
-            "id": user_data.pop('id', 'None'),
+            "id": user_data.get('id', 'None'),
             "profile": {}
         }
-        for key, val in user_data.items():
-            user_dict['profile'][key] = val
+        if 'login' in user_data:
+            user_dict['profile']['login'] = user_data['login']
+        if 'mobile_phone' in user_data:
+            user_dict['profile']['mobilePhone'] = user_data['mobile_phone']
+        if 'first_name' in user_data:
+            user_dict['profile']['firstName'] = user_data['first_name']
+        if 'last_name' in user_data:
+            user_dict['profile']['lastName'] = user_data['last_name']
+        if 'email' in user_data:
+            user_dict['profile']['email'] = user_data['email']
 
         return json.dumps(user_dict)
 
-    def create_update_user_path(self, user_id):
+    @staticmethod
+    def _format_user_data_received(user_data):
+        user_dict = {
+            'id': user_data['id'],
+            'login': user_data['profile']['login'],
+            'mobile_phone': user_data['profile']['mobilePhone']
+        }
+        return user_dict
+
+    @staticmethod
+    def _validate_user_data(user):
+        fields = ['login', 'mobile_phone', 'first_name', 'last_name', 'email']
+        if not all([field in user and user[field] for field in fields]):
+            raise AssertionError('user is missing fields')
+
+    def _create_update_user_path(self, user_id):
         return self.route + "/" + user_id
 
     def create_user(self, user_data):
-        self.validate_user_data(user_data)
-        user = self.format_user_data_to_send(user_data)
+        self._validate_user_data(user_data)
+        user = self._format_user_data_to_send(user_data)
         route = self.route
         response, status_code = self._api_client.post(route, user)
         return response, status_code
@@ -39,18 +63,15 @@ class UserBroker:
         response, status_code = self._api_client.get(route)
 
         if len(response) and status_code == 200:
-            return response[0]
+            return self._format_user_data_received(response[0])
 
     def update_user_phone_number(self, user_id, phone_number):
         assert user_id
         assert phone_number
 
-        user = self.format_user_data_to_send({'id': user_id, 'mobilePhone': phone_number})
-        route = self.create_update_user_path(user_id)
+        user = self._format_user_data_to_send({'id': user_id, 'mobile_phone': phone_number})
+        route = self._create_update_user_path(user_id)
         response, status_code = self._api_client.post(route, user)
-        return response, status_code
 
-    def validate_user_data(self, user):
-        fields = ['login', 'mobilePhone', 'firstName', 'lastName', 'email']
-        if not all([field in user and user[field] for field in fields]):
-            raise AssertionError('user is missing fields')
+        if len(response) and status_code == 200:
+            return self._format_user_data_received(response)
