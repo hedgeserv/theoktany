@@ -13,8 +13,6 @@ class UserBroker:
             "id": user_data.get('id', 'None'),
             "profile": {}
         }
-        if 'login' in user_data:
-            user_dict['profile']['login'] = user_data['login']
         if 'mobile_phone' in user_data:
             user_dict['profile']['mobilePhone'] = user_data['mobile_phone']
         if 'first_name' in user_data:
@@ -22,6 +20,7 @@ class UserBroker:
         if 'last_name' in user_data:
             user_dict['profile']['lastName'] = user_data['last_name']
         if 'email' in user_data:
+            user_dict['profile']['login'] = user_data['email']
             user_dict['profile']['email'] = user_data['email']
 
         return json.dumps(user_dict)
@@ -37,9 +36,10 @@ class UserBroker:
 
     @staticmethod
     def _validate_user_data(user):
-        fields = ['login', 'mobile_phone', 'first_name', 'last_name', 'email']
+        fields = ['mobile_phone', 'first_name', 'last_name', 'email']
         if not all([field in user and user[field] for field in fields]):
-            raise AssertionError('user is missing fields')
+            raise AssertionError(
+                'Dictionary is missing some fields - it must have mobile_phone, first_name, last_name, and email.')
 
     def _create_update_user_path(self, user_id):
         return self.route + "/" + user_id
@@ -51,13 +51,13 @@ class UserBroker:
         response, status_code = self._api_client.post(route, user)
         return response, status_code
 
-    def get_user_id(self, user_login):
-        user = self.get_user(user_login)
+    def get_user_id(self, email):
+        user = self.get_user(email)
         if user:
             return user['id']
 
-    def get_user(self, user_login):
-        filter_string = "filter=profile.login+eq+\"" + user_login + "\"" + '&limit=1'
+    def get_user(self, email):
+        filter_string = 'filter=profile.login+eq+"%s"&limit=1' % email
         route = self.route + '?' + filter_string
 
         response, status_code = self._api_client.get(route)
