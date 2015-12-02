@@ -30,11 +30,11 @@ class TestUserBroker(unittest.TestCase):
 
     def test_create_new_user_with_valid_data(self):
         self.setup_imposter('create_new_user.json')
-        user, code = self.broker.create_user(user_two)
-        self.assertEqual(code, 200)
+        user = self.broker.create_user(user_two)
+        self.assertIsNotNone(user)
         self.assertEqual(user['id'], "00002")
-        self.assertEqual(user['profile']['login'], user_two.get('login'))
-        self.assertEqual(user['profile']['mobilePhone'], user_two.get('mobile_phone'))
+        self.assertEqual(user['login'], user_two.get('login'))
+        self.assertEqual(user['mobile_phone'], user_two.get('mobile_phone'))
 
     def test_update_existing_user_with_id(self):
         self.setup_imposter('update_existing_user.json')
