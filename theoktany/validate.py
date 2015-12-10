@@ -1,5 +1,5 @@
 def validate(response, status_code):
-    if status_code == 200:
+    if status_code in [200, 201, 202, 204]:
         return response, "Success"
 
     if response.get('errorCauses'):

@@ -1,9 +1,12 @@
 import json
 
+from theoktany.auth_client import OktaAuthClient, OktaFactors
+
 
 class UserBroker:
-    def __init__(self, api_client):
+    def __init__(self, api_client, auth_client=None, factors=None):
         self._api_client = api_client
+        self._auth_client = auth_client or OktaAuthClient(factors or OktaFactors(api_client))
         self.route = '/api/v1/users'
 
     @staticmethod
@@ -64,14 +67,3 @@ class UserBroker:
 
         if len(response) and status_code == 200:
             return self._format_user_data_received(response[0])
-
-    def update_user_phone_number(self, user_id, phone_number):
-        assert user_id
-        assert phone_number
-
-        user = self._format_user_data_to_send({'id': user_id, 'mobile_phone': phone_number})
-        route = self._create_update_user_path(user_id)
-        response, status_code = self._api_client.post(route, user)
-
-        if len(response) and status_code == 200:
-            return self._format_user_data_received(response)
