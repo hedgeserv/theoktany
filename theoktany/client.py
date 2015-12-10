@@ -50,7 +50,7 @@ class ApiClient(object):
         return self._process_response(response)
 
     def delete(self, path, params=None):
-        response = requests.get(self._base_url+path, params=params, headers=self._headers)
+        response = requests.delete(self._base_url+path, params=params, headers=self._headers)
         return self._process_response(response)
 
     @staticmethod

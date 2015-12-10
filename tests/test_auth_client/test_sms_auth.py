@@ -178,3 +178,9 @@ class SMSAuthTests(unittest.TestCase):
         response, message = auth_client.update_sms_phone_number(user_two['id'], '+1 666-666-6666')
         self.assertFalse(response)
         self.assertEqual('Tom wanted 100% test coverage.', message)
+
+    def test_update_sms_phone_number_delete_failure(self):
+        auth_client = self.setup_imposter('test_sms_delete_factor.json')
+        response, message = auth_client.update_sms_phone_number(user_three['id'], '+1 666-666-6666')
+        self.assertFalse(response)
+        self.assertEqual('Tom wanted 100% test coverage.', message)
