@@ -36,6 +36,20 @@ class TestUserBroker(unittest.TestCase):
         self.assertEqual(user['login'], user_two.get('login'))
         self.assertEqual(user['mobile_phone'], user_two.get('mobile_phone'))
 
+    def test_update_existing_user_with_id(self):
+        self.setup_imposter('update_existing_user.json')
+        user = self.broker.update_user_phone_number(user_three['id'], user_three['mobile_phone'])
+        self.assertIsNotNone(user)
+        self.assertEqual(user['id'], user_three.get('id'))
+        self.assertEqual(user['login'], user_three.get('login'))
+        self.assertEqual(user['mobile_phone'], user_three.get('mobile_phone'))
+
+    def test_update_existing_user_without_id_or_phone(self):
+        with self.assertRaises(AssertionError):
+            self.broker.update_user_phone_number(user_two['id'], user_two['mobile_phone'])
+        with self.assertRaises(AssertionError):
+            self.broker.update_user_phone_number(user_three['id'], None)
+
     def test_get_user_method(self):
         self.setup_imposter('update_existing_user.json')
         user = self.broker.get_user(user_four.get('login'))
