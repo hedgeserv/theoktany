@@ -55,6 +55,10 @@ class TestUserBroker(unittest.TestCase):
         user = self.broker.get_user(user_four.get('login'))
         self.assertEqual(user['login'], user_four.get('login'))
 
+        self.assertIn('factors', user)
+        self.assertEqual(len(user['factors']), 1)
+        self.assertEqual(user['factors'][0]['phone_number'], user_four['mobile_phone'])
+
     def test_get_user_id_method(self):
         self.setup_imposter('update_existing_user.json')
         user_id = self.broker.get_user_id(user_four.get('login'))
