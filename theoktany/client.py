@@ -49,6 +49,10 @@ class ApiClient(object):
         response = requests.post(self._base_url+path, data=data, headers=self._headers)
         return self._process_response(response)
 
+    def delete(self, path, params=None):
+        response = requests.delete(self._base_url+path, params=params, headers=self._headers)
+        return self._process_response(response)
+
     @staticmethod
     def check_api_response(response, status_code, acceptable_status_codes=None):
         """Make sure that the API response was what was expected."""

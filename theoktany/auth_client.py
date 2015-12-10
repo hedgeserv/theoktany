@@ -2,17 +2,21 @@ from theoktany.serializers import serialize
 from theoktany.validate import validate
 from theoktany.client import ApiClient
 
+
 class OktaFactors(object):
     def __init__(self, api_client=ApiClient):
         self._api_client = api_client
 
     def get_factors(self, user_id):
+        # noinspection PyArgumentList
         return validate(*self._api_client.get('/api/v1/users/{}/factors'.format(user_id)))
 
-    def filter_by_type(self, factors, factor_type="sms"):
+    @staticmethod
+    def filter_by_type(factors, factor_type="sms"):
         return [factor for factor in factors if factor['factorType'] == factor_type]
 
-    def create_factor_object(self, phone_number, factor_type="sms"):
+    @staticmethod
+    def create_factor_object(phone_number, factor_type="sms"):
         return {
             "factorType": factor_type,
             "provider": "OKTA",
@@ -48,6 +52,11 @@ class OktaFactors(object):
 
         data = self.create_factor_object(phone_number, factor_type)
         route = '/api/v1/users/{}/factors'.format(user_id)
+
+        if factor_type == "sms":
+            route += '?updatePhone=true'
+
+        # noinspection PyArgumentList
         return validate(*self._api_client.post(route, data=serialize(data)))
 
     def activate(self, user_id, pass_code, factor_type="sms"):
@@ -56,7 +65,18 @@ class OktaFactors(object):
 
         def v(factor_id):
             route = '/api/v1/users/{}/factors/{}/lifecycle/activate'.format(user_id, factor_id)
+            # noinspection PyArgumentList
             return validate(*self._api_client.post(route, data=serialize({'passCode': pass_code})))
+
+        return self.call_with_correct_factor(v, user_id, factor_type)
+
+    def delete(self, user_id, factor_type="sms"):
+        assert user_id
+
+        def v(factor_id):
+            route = '/api/v1/users/{}/factors/{}'.format(user_id, factor_id)
+            # noinspection PyArgumentList
+            return validate(*self._api_client.delete(route))
 
         return self.call_with_correct_factor(v, user_id, factor_type)
 
@@ -65,6 +85,7 @@ class OktaFactors(object):
 
         def v(factor_id):
             route = '/api/v1/users/{}/factors/{}/verify'.format(user_id, factor_id)
+            # noinspection PyArgumentList
             return validate(*self._api_client.post(route))
 
         return self.call_with_correct_factor(v, user_id, factor_type)
@@ -75,6 +96,7 @@ class OktaFactors(object):
 
         def v(factor_id):
             route = '/api/v1/users/{}/factors/{}/verify'.format(user_id, factor_id)
+            # noinspection PyArgumentList
             return validate(*self._api_client.post(route, data=serialize({'passCode': pass_code})))
 
         return self.call_with_correct_factor(v, user_id, factor_type)
@@ -99,3 +121,12 @@ class OktaAuthClient(object):
 
     def is_user_enrolled_for_sms(self, user_id):
         return self.factors.is_enrolled(user_id, factor_type="sms")
+
+    def delete_sms_factor(self, user_id):
+        return self.factors.delete(user_id, factor_type="sms")
+
+    def update_sms_phone_number(self, user_id, phone_number):
+        success, message = self.delete_sms_factor(user_id)
+        if message != 'Success':
+            return success, message
+        return self.enroll_user_for_sms(user_id, phone_number)
