@@ -44,9 +44,6 @@ class UserBroker:
             raise AssertionError(
                 'Dictionary is missing some fields - it must have mobile_phone, first_name, last_name, and email.')
 
-    def _create_update_user_path(self, user_id):
-        return self.route + "/" + user_id
-
     def create_user(self, user_data):
         self._validate_user_data(user_data)
         user = self._format_user_data_to_send(user_data)
