@@ -167,8 +167,14 @@ class SMSAuthTests(unittest.TestCase):
     def test_update_sms_phone_number(self):
         auth_client = self.setup_imposter('test_sms_delete_factor.json')
         new_phone_number = '+1 666-666-6666'
-        response, message = auth_client.update_sms_phone_number(user_one['id'], '+1 666-666-6666')
+        response, message = auth_client.update_sms_phone_number(user_one['id'], new_phone_number)
         self.assertTrue(response)
         self.assertEqual(response.get('id'), user_one.get('id'))
         self.assertEqual(response['profile']['phoneNumber'], new_phone_number)
         self.assertEqual(message, "Success")
+
+    def test_update_sms_phone_number_failure(self):
+        auth_client = self.setup_imposter('test_sms_delete_factor.json')
+        response, message = auth_client.update_sms_phone_number(user_two['id'], '+1 666-666-6666')
+        self.assertFalse(response)
+        self.assertEqual('Tom wanted 100% test coverage.', message)
