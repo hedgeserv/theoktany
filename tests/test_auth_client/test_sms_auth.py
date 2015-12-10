@@ -33,7 +33,8 @@ class SMSAuthTests(unittest.TestCase):
             self.auth_client.enroll_user_for_sms(user_no_id.get('id'), user_no_id.get('phone_number'))
 
         with self.assertRaises(AssertionError):
-            self.auth_client.enroll_user_for_sms(user_no_phone_number.get('id'), user_no_phone_number.get('phone_number'))
+            self.auth_client.enroll_user_for_sms(
+                    user_no_phone_number.get('id'), user_no_phone_number.get('phone_number'))
 
     def test_sms_enrollment_success(self):
         auth_client = self.setup_imposter('test_sms_enrollment.json')
@@ -157,3 +158,17 @@ class SMSAuthTests(unittest.TestCase):
         auth_client = self.setup_imposter('test_sms_is_enrolled.json')
         is_enrolled = auth_client.is_user_enrolled_for_sms("invalid_id")
         self.assertFalse(is_enrolled)
+
+    def test_delete_sms_factor(self):
+        auth_client = self.setup_imposter('test_sms_delete_factor.json')
+        response, message = auth_client.delete_sms_factor(user_one['id'])
+        self.assertEqual(message, 'Success')
+
+    def test_update_sms_phone_number(self):
+        auth_client = self.setup_imposter('test_sms_delete_factor.json')
+        new_phone_number = '+1 666-666-6666'
+        response, message = auth_client.update_sms_phone_number(user_one['id'], '+1 666-666-6666')
+        self.assertTrue(response)
+        self.assertEqual(response.get('id'), user_one.get('id'))
+        self.assertEqual(response['profile']['phoneNumber'], new_phone_number)
+        self.assertEqual(message, "Success")

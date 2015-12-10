@@ -26,7 +26,7 @@ class TestUserBroker(unittest.TestCase):
 
     def test_create_new_user_with_invalid_data(self):
         with self.assertRaises(AssertionError):
-            response = self.broker.create_user(user_one)
+            self.broker.create_user(user_one)
 
     def test_create_new_user_with_valid_data(self):
         self.setup_imposter('create_new_user.json')
@@ -35,20 +35,6 @@ class TestUserBroker(unittest.TestCase):
         self.assertEqual(user['id'], "00002")
         self.assertEqual(user['profile']['login'], user_two.get('login'))
         self.assertEqual(user['profile']['mobilePhone'], user_two.get('mobile_phone'))
-
-    def test_update_existing_user_with_id(self):
-        self.setup_imposter('update_existing_user.json')
-        user = self.broker.update_user_phone_number(user_three['id'], user_three['mobile_phone'])
-        self.assertIsNotNone(user)
-        self.assertEqual(user['id'], user_three.get('id'))
-        self.assertEqual(user['login'], user_three.get('login'))
-        self.assertEqual(user['mobile_phone'], user_three.get('mobile_phone'))
-
-    def test_update_existing_user_without_id_or_phone(self):
-        with self.assertRaises(AssertionError):
-            self.broker.update_user_phone_number(user_two['id'], user_two['mobile_phone'])
-        with self.assertRaises(AssertionError):
-            self.broker.update_user_phone_number(user_three['id'], None)
 
     def test_get_user_method(self):
         self.setup_imposter('update_existing_user.json')
