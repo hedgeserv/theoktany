@@ -13,6 +13,12 @@ user_three = dict(
     id="00001", login="dave@aol.com", email="dave@aol.com", mobile_phone="123-456-7890", first_name='A', last_name='A')
 user_four = dict(
     id=None, login="harry@aol.com", email="harry@aol.com", mobile_phone="345-6789-0123", first_name='A', last_name='A')
+user_five = {
+    'id': None, 'login': 'not-in-okta@aol.com', 'email': "not-in-okta@aol.com", 'mobile_phone': "345-6789-0123",
+    'first_name': 'A', 'last_name': 'A'}
+user_six = {
+    'id': None, 'login': 'factors-fail@aol.com', 'email': "factors-fail@aol.com", 'mobile_phone': "345-6789-0123",
+    'first_name': 'A', 'last_name': 'A'}
 
 
 class TestUserBroker(unittest.TestCase):
@@ -54,6 +60,18 @@ class TestUserBroker(unittest.TestCase):
         self.setup_imposter('update_existing_user.json')
         user = self.broker.get_user(user_four.get('login'))
         self.assertEqual(user['login'], user_four.get('login'))
+
+        self.assertIn('factors', user)
+        self.assertEqual(len(user['factors']), 1)
+        self.assertEqual(user['factors'][0]['phone_number'], user_four['mobile_phone'])
+
+    def test_get_user_fail(self):
+        self.setup_imposter('update_existing_user.json')
+        self.assertIsNone(self.broker.get_user(user_five.get('login')))
+
+    def test_get_user_factors_fail(self):
+        self.setup_imposter('update_existing_user.json')
+        self.assertIsNone(self.broker.get_user(user_six.get('login')))
 
     def test_get_user_id_method(self):
         self.setup_imposter('update_existing_user.json')

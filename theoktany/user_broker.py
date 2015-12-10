@@ -1,12 +1,9 @@
 import json
 
-from theoktany.auth_client import OktaAuthClient, OktaFactors
-
 
 class UserBroker:
-    def __init__(self, api_client, auth_client=None, factors=None):
+    def __init__(self, api_client):
         self._api_client = api_client
-        self._auth_client = auth_client or OktaAuthClient(factors or OktaFactors(api_client))
         self.route = '/api/v1/users'
 
     @staticmethod
@@ -33,9 +30,23 @@ class UserBroker:
         user_dict = {
             'id': user_data['id'],
             'login': user_data['profile']['login'],
-            'mobile_phone': user_data['profile']['mobilePhone']
+            'mobile_phone': user_data['profile']['mobilePhone'],
+            'factors': [],
         }
         return user_dict
+
+    @staticmethod
+    def _format_user_factors_received(factors_data):
+        factors = []
+
+        for factor in factors_data:
+            factors.append({
+                'id': factor['id'],
+                'type': factor['factorType'],
+                'phone_number': factor['profile']['phoneNumber']
+            })
+
+        return factors
 
     @staticmethod
     def _validate_user_data(user):
@@ -65,10 +76,21 @@ class UserBroker:
         filter_string = 'filter=profile.login+eq+"%s"&limit=1' % email
         route = self.route + '?' + filter_string
 
-        response, status_code = self._api_client.get(route)
+        # first, get the user data
+        user_response, status_code = self._api_client.get(route)
+        if not (len(user_response) and status_code == 200 and 'id' in user_response[0]):
+            return None
 
-        if len(response) and status_code == 200:
-            return self._format_user_data_received(response[0])
+        user_data = self._format_user_data_received(user_response[0])
+
+        # now, get all the factors
+        factor_route = self._create_update_user_path(user_data['id']) + '/factors'
+        factors_response, status_code = self._api_client.get(factor_route)
+        if not status_code == 200:
+            return None
+        user_data['factors'] = self._format_user_factors_received(factors_response)
+
+        return user_data
 
     def update_user_phone_number(self, user_id, phone_number):
         assert user_id
