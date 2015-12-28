@@ -66,10 +66,10 @@ class OktaFactors(object):
 
         return factor
 
-    def is_enrolled(self, user_id, factor_type):
+    def is_enrolled(self, user_id, factor_type, provider):
         factors, message, error_code = self.get_factors(user_id)
         if factors and not error_code:
-            filtered_factors = self.filter_by_type(factors, factor_type)
+            filtered_factors = self.filter_by_type(factors, factor_type, provider)
             if filtered_factors and filtered_factors[0]['status'] == 'ACTIVE':
                 return True
         return False
@@ -172,7 +172,7 @@ class OktaAuthClient(object):
         return self.factors.verify(user_id, passcode)
 
     def is_user_enrolled_for_sms(self, user_id):
-        return self.factors.is_enrolled(user_id, factor_type="sms")
+        return self.factors.is_enrolled(user_id, factor_type='sms', provider='OKTA')
 
     def delete_sms_factor(self, user_id):
         return self.factors.delete(user_id, factor_type="sms")
@@ -191,6 +191,9 @@ class OktaAuthClient(object):
 
     def verify_google_authenticator_factor(self, user_id, passcode):
         return self.factors.verify(user_id, passcode, factor_type='token:software:totp', provider='GOOGLE')
+
+    def is_user_enrolled_for_google_authenticator(self, user_id):
+        return self.factors.is_enrolled(user_id, factor_type='token:software:totp', provider='GOOGLE')
 
     def delete_google_authenticator_factor(self, user_id):
         return self.factors.delete(user_id, factor_type='token:software:totp', provider='GOOGLE')
