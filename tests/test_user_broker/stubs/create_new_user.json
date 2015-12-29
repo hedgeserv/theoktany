@@ -1,76 +1,128 @@
 [
   {
-      "predicates":[
-         {
-            "equals":{
-               "method":"POST",
-               "path":"/api/v1/users"
+    "predicates": [
+      {
+        "equals": {
+          "method": "POST",
+          "path": "/api/v1/users"
+        }
+      },
+      {
+        "contains": {
+          "body": "different-email@aol.com"
+        }
+      }
+    ],
+    "responses": [
+      {
+        "is": {
+          "statusCode": 200,
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "id": "00002",
+            "status": "STAGED",
+            "created": "2013-07-02T21:36:25.344Z",
+            "activated": null,
+            "statusChanged": null,
+            "lastLogin": null,
+            "lastUpdated": "2013-07-02T21:36:25.344Z",
+            "passwordChanged": null,
+            "profile": {
+              "firstName": "Gary",
+              "lastName": "Garrison",
+              "email": "some-email@aol.com",
+              "login": "different-email@aol.com",
+              "mobilePhone": "234-567-8901"
+            },
+            "credentials": {
+              "provider": {
+                "type": "OKTA",
+                "name": "OKTA"
+              }
+            },
+            "_links": {
+              "activate": {
+                "href": "https://your-domain.okta.com/api/v1/users/00ub0oNGTSWTBKOLGLNR/lifecycle/activate"
+              }
             }
-         }
-      ],
-      "responses":[
-         {
-            "is":{
-               "statusCode":200,
-               "headers":{
-                  "Content-Type":"application/json"
-               },
-               "body": {
-                   "id":"00002",
-                   "status":"STAGED",
-                   "created":"2013-07-02T21:36:25.344Z",
-                   "activated":null,
-                   "statusChanged":null,
-                   "lastLogin":null,
-                   "lastUpdated":"2013-07-02T21:36:25.344Z",
-                   "passwordChanged":null,
-                   "profile":{
-                      "firstName":"Gary",
-                      "lastName":"Garrison",
-                      "email":"gary@aol.com",
-                      "login":"gary@aol.com",
-                      "mobilePhone":"234-567-8901"
-                   },
-                   "credentials":{
-                      "provider":{
-                         "type":"OKTA",
-                         "name":"OKTA"
-                      }
-                   },
-                   "_links":{
-                      "activate":{
-                         "href":"https://your-domain.okta.com/api/v1/users/00ub0oNGTSWTBKOLGLNR/lifecycle/activate"
-                      }
-                   }
-               }
-            }
-         }
-      ]
-   },
-
+          }
+        }
+      }
+    ]
+  },
   {
-      "predicates":[
-         {
-            "equals":{
-               "method":"GET",
-               "path":"/api/v1/users",
-                "query":{
-                  "filter": "profile.login eq \"gary@aol.com\"",
-                  "limit": "1"
-                }
+    "predicates": [
+      {
+        "equals": {
+          "method": "POST",
+          "path": "/api/v1/users"
+        }
+      }
+    ],
+    "responses": [
+      {
+        "is": {
+          "statusCode": 200,
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "id": "00002",
+            "status": "STAGED",
+            "created": "2013-07-02T21:36:25.344Z",
+            "activated": null,
+            "statusChanged": null,
+            "lastLogin": null,
+            "lastUpdated": "2013-07-02T21:36:25.344Z",
+            "passwordChanged": null,
+            "profile": {
+              "firstName": "Gary",
+              "lastName": "Garrison",
+              "email": "gary@aol.com",
+              "login": "gary@aol.com",
+              "mobilePhone": "234-567-8901"
+            },
+            "credentials": {
+              "provider": {
+                "type": "OKTA",
+                "name": "OKTA"
+              }
+            },
+            "_links": {
+              "activate": {
+                "href": "https://your-domain.okta.com/api/v1/users/00ub0oNGTSWTBKOLGLNR/lifecycle/activate"
+              }
             }
-         }
-      ],
-      "responses":[
-         {
-            "is":{
-               "statusCode":404,
-               "headers":{
-                  "Content-Type":"application/json"
-               },
-               "body": []
-            }
-         }
-      ]
-   }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "predicates": [
+      {
+        "equals": {
+          "method": "GET",
+          "path": "/api/v1/users",
+          "query": {
+            "filter": "profile.login eq \"gary@aol.com\"",
+            "limit": "1"
+          }
+        }
+      }
+    ],
+    "responses": [
+      {
+        "is": {
+          "statusCode": 404,
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": []
+        }
+      }
+    ]
+  }
 ]
