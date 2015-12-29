@@ -20,8 +20,10 @@ class UserBroker:
         if 'last_name' in user_data:
             user_dict['profile']['lastName'] = user_data['last_name']
         if 'email' in user_data:
-            user_dict['profile']['login'] = user_data['email']
             user_dict['profile']['email'] = user_data['email']
+            user_dict['profile']['login'] = user_data['email']
+        if 'login' in user_data:
+            user_dict['profile']['login'] = user_data['login']
 
         return json.dumps(user_dict)
 
@@ -30,6 +32,7 @@ class UserBroker:
         user_dict = {
             'id': user_data['id'],
             'login': user_data['profile']['login'],
+            'email': user_data['profile']['email'],
             'mobile_phone': user_data['profile']['mobilePhone'],
             'factors': [],
         }
