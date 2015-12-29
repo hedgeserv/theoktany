@@ -16,14 +16,25 @@
           },
           "body": [
             {
-              "id": "sms00001",
-              "factorType": "sms",
-              "provider": "OKTA",
+              "id": "ostf1fmaMGJLMNGNLIVG",
+              "factorType": "token:software:totp",
+              "provider": "GOOGLE",
               "status": "ACTIVE",
               "created": "2014-08-05T20:59:49.000Z",
               "lastUpdated": "2014-08-06T03:59:49.000Z",
-              "profile": {
-                "phoneNumber": "+1-555-555-5555"
+              "_embedded": {
+                "activation": {
+                  "timeStep": 30,
+                  "sharedSecret": "JBTWGV22G4ZGKV3N",
+                  "encoding": "base32",
+                  "keyLength": 16,
+                  "_links": {
+                    "qrcode": {
+                      "href": "http://localhost:5555/api/v1/users/00001/factors/ostf1fmaMGJLMNGNLIVG/qr/00fukNElRS_Tz6k-CFhg3pH4KO2dj2guhmaapXWbc4",
+                      "type": "image/png"
+                    }
+                  }
+                }
               }
             }
           ]
@@ -35,7 +46,7 @@
     "predicates": [
       {
         "equals": {
-          "path": "/api/v1/users/00001/factors/sms00001/verify"
+          "path": "/api/v1/users/00001/factors/ostf1fmaMGJLMNGNLIVG/verify"
         }
       },
       {
@@ -64,39 +75,7 @@
     "predicates": [
       {
         "equals": {
-          "method": "GET",
-          "path": "/api/v1/users/00002/factors"
-        }
-      }
-    ],
-    "responses": [
-      {
-        "is": {
-          "headers": {
-            "Content-Type": "application/json"
-          },
-          "body": [
-            {
-              "id": "sms00002",
-              "factorType": "sms",
-              "provider": "OKTA",
-              "status": "ACTIVE",
-              "created": "2014-08-05T20:59:49.000Z",
-              "lastUpdated": "2014-08-06T03:59:49.000Z",
-              "profile": {
-                "phoneNumber": "+1-555-555-5555"
-              }
-            }
-          ]
-        }
-      }
-    ]
-  },
-  {
-    "predicates": [
-      {
-        "equals": {
-          "path": "/api/v1/users/00002/factors/sms00002/verify"
+          "path": "/api/v1/users/00001/factors/ostf1fmaMGJLMNGNLIVG/verify"
         }
       },
       {
@@ -133,7 +112,24 @@
     "predicates": [
       {
         "equals": {
-          "path": "/api/v1/users/invalid_id/factors"
+          "method": "DELETE",
+          "path": "/api/v1/users/00001/factors/00001"
+        }
+      }
+    ],
+    "responses": [
+      {
+        "is": {
+          "statusCode": 204
+        }
+      }
+    ]
+  },
+  {
+    "predicates": [
+      {
+        "equals": {
+          "path": "/api/v1/users/00004/factors"
         }
       }
     ],
@@ -151,38 +147,6 @@
             "errorCauses": [],
             "errorId": "oaeinnziNStQHuDfv6ApTKCIg"
           }
-        }
-      }
-    ]
-  },
-  {
-    "predicates": [
-      {
-        "equals": {
-          "method": "GET",
-          "path": "/api/v1/users/00003/factors"
-        }
-      }
-    ],
-    "responses": [
-      {
-        "is": {
-          "headers": {
-            "Content-Type": "application/json"
-          },
-          "body": [
-            {
-              "id": "00003",
-              "factorType": "token:software:totp",
-              "provider": "OKTA",
-              "status": "PENDING_ACTIVATION",
-              "created": "2014-08-05T20:59:49.000Z",
-              "lastUpdated": "2014-08-06T03:59:49.000Z",
-              "profile": {
-                "phoneNumber": "+1-555-555-5555"
-              }
-            }
-          ]
         }
       }
     ]

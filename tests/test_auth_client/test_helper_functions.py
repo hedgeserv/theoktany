@@ -127,7 +127,7 @@ class GetQRCodeTests(TestCase):
         self.mb.destroy_all_imposters()
 
     def setup_imposter(self, file_name):
-        port = self.mb.create_imposter('test_api_client/stubs/' + file_name)
+        port = self.mb.create_imposter('test_auth_client/stubs/' + file_name)
         return self.mb.get_imposter_url(port)
 
     def test_happy_path(self):

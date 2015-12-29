@@ -1,0 +1,90 @@
+[
+  {
+    "predicates": [
+      {
+        "equals": {
+          "method": "POST",
+          "path": "/api/v1/users/00001/factors"
+        }
+      },
+      {
+        "contains": {
+          "body": {
+            "factorType": "token:software:totp",
+            "provider": "GOOGLE"
+          }
+        }
+      }
+    ],
+    "responses": [
+      {
+        "is": {
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "id": "ostf1fmaMGJLMNGNLIVG",
+            "factorType": "token:software:totp",
+            "provider": "GOOGLE",
+            "status": "PENDING_ACTIVATION",
+            "created": "2014-08-05T20:59:49.000Z",
+            "lastUpdated": "2014-08-06T03:59:49.000Z",
+            "_embedded": {
+              "activation": {
+                "timeStep": 30,
+                "sharedSecret": "JBTWGV22G4ZGKV3N",
+                "encoding": "base32",
+                "keyLength": 16,
+                "_links": {
+                  "qrcode": {
+                    "href": "http://localhost:5555/api/v1/users/00001/factors/ostf1fmaMGJLMNGNLIVG/qr/00fukNElRS_Tz6k-CFhg3pH4KO2dj2guhmaapXWbc4",
+                    "type": "image/png"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "predicates": [
+      {
+        "equals": {
+          "method": "POST",
+          "path": "/api/v1/users/00002/factors"
+        }
+      },
+      {
+        "contains": {
+          "body": {
+            "factorType": "token:software:totp",
+            "provider": "GOOGLE"
+          }
+        }
+      }
+    ],
+    "responses": [
+      {
+        "is": {
+          "statusCode": 400,
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "errorCode": "E0000001",
+            "errorSummary": "Api validation failed: factorEnrollRequest",
+            "errorLink": "E0000001",
+            "errorCauses": [
+              {
+                "errorSummary": "Factor already exists."
+              }
+            ],
+            "errorId": "oaeinnziNStQHuDfv6ApTKCIg"
+          }
+        }
+      }
+    ]
+  }
+]

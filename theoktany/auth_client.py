@@ -67,6 +67,10 @@ class OktaFactors(object):
         return factor
 
     def is_enrolled(self, user_id, factor_type, provider):
+        assert user_id
+        assert factor_type
+        assert provider
+
         factors, message, error_code = self.get_factors(user_id)
         if factors and not error_code:
             filtered_factors = self.filter_by_type(factors, factor_type, provider)
@@ -76,14 +80,14 @@ class OktaFactors(object):
 
     def call_with_correct_factor(self, v, user_id, factor_type, provider):
         factors, message, error_code = self.get_factors(user_id)
-        if factors and not error_code:
+        if not error_code:
             filtered_factors = self.filter_by_type(factors, factor_type, provider)
 
             if filtered_factors:
                 factor_id = filtered_factors[0]['id']
                 return v(factor_id)
             else:
-                return False, "Not enrolled for SMS.", '1'
+                return False, "Not enrolled in factor.", '1'
 
         return False, message, error_code
 
