@@ -81,7 +81,7 @@ class MountebankProcess(object):
 
         # We store the body as JSON in the files for legibility but Mountebank wants the body as a string.
         for stub in stubs:
-            for predicate in stub['predicates']:
+            for predicate in stub.get('predicates', []):
                 if 'contains' in predicate:
                     predicate['contains']['body'] = json.dumps(predicate['contains']['body'])
             for response in stub['responses']:

@@ -8,16 +8,16 @@ def _validate(response, status_code):
     if status_code in [200, 201, 202, 204]:
         return response, "Success", None
 
-    if response.get('errorCode'):
-        error_code = response['errorCode']
-    else:
-        error_code = None
+    error_code = response.get('errorCode')
 
-    if response.get('errorCauses'):
-        message = response['errorCauses'][0]['errorSummary']
-    elif response.get('errorSummary'):
-        message = response['errorSummary']
-    else:
+    try:
+        if response.get('errorCauses'):
+            message = response['errorCauses'][0]['errorSummary']
+        elif response.get('errorSummary'):
+            message = response['errorSummary']
+        else:
+            message = 'Okta returned {}.'.format(status_code)
+    except KeyError:
         message = 'Okta returned {}.'.format(status_code)
 
     return False, message, error_code
