@@ -17,5 +17,78 @@
         }
       }
     ]
+  },
+  {
+    "predicates": [
+      {
+        "equals": {
+          "path": "/api/v1/users"
+        }
+      }
+    ],
+    "responses": [
+      {
+        "is": {
+          "headers": {
+            "Set-Cookie": "sid=\"\"; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Path=/, JSESSIONID=B346EE69B6FF408F96E06C1EFCD7FC28; Path=/",
+            "Vary": "Accept-Encoding",
+            "X-Rate-Limit-Reset": "1451487682",
+            "Date": "Wed, 30 Dec 2015 15:00:22 GMT",
+            "Expires": "0",
+            "Content-Type": "application/json;charset=UTF-8",
+            "Transfer-Encoding": "chunked",
+            "Server": "nginx",
+            "Pragma": "no-cache",
+            "Strict-Transport-Security": "max-age=315360000",
+            "Keep-Alive": "timeout=5, max=100",
+            "P3P": "CP='HONK'",
+            "Cache-Control": "no-cache, no-store",
+            "X-Rate-Limit-Remaining": "1199",
+            "Connection": "Keep-Alive",
+            "Link": "<https://hedgeserv.oktapreview.com/api/v1/users?limit=1>; rel=\"self\", <https://hedgeserv.oktapreview.com/api/v1/users?after=1&limit=1>; rel=\"next\"",
+            "X-Rate-Limit-Limit": "1200"
+          },
+          "body": {
+            "id": "00u5fmgzvskFx7wr20h7",
+            "status": "STAGED",
+            "created": "2015-11-25T14:53:35.000Z",
+            "activated": null,
+            "statusChanged": null,
+            "lastLogin": null,
+            "lastUpdated": "2015-11-25T14:53:35.000Z",
+            "passwordChanged": null,
+            "profile": {
+              "email": "sms_ExpiringPassword+1@fakehedgeserv.com",
+              "firstName": "Test",
+              "lastName": "User",
+              "login": "sms_ExpiringPassword+1@fakehedgeserv.com",
+              "mobilePhone": null,
+              "secondEmail": null
+            },
+            "credentials": {
+              "provider": {
+                "type": "OKTA",
+                "name": "OKTA"
+              }
+            },
+            "_links": {
+              "activate": {
+                "href": "https://hedgeserv.oktapreview.com/api/v1/users/00u5fmgzvskFx7wr20h7/lifecycle/activate",
+                "method": "POST"
+              },
+              "deactivate": {
+                "href": "https://hedgeserv.oktapreview.com/api/v1/users/00u5fmgzvskFx7wr20h7/lifecycle/deactivate",
+                "method": "POST"
+              }
+            }
+          }
+        }
+      },
+      {
+        "is": {
+          "statusCode": 500
+        }
+      }
+    ]
   }
 ]
