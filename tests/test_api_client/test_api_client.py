@@ -1,5 +1,6 @@
 """Tests for API client"""
 
+from datetime import datetime
 from importlib import reload    # this is Python 3 specific
 import os
 import unittest
@@ -133,6 +134,20 @@ class TestResponses(unittest.TestCase):
             raise AssertionError("check_api_response should have raised an exception and didn't.")
         except ApiException as err:
             self.assertIn('Okta returned 400', str(err))
+
+    def test_check_status(self):
+        imposter = self.mb.create_imposter('test_api_client/stubs/test_client_response.json')
+        imposter_url = self.mb.get_imposter_url(imposter)
+        api_client = ApiClient(BASE_URL=imposter_url)
+        status = api_client.check_status()
+
+        self.assertTrue(status['okta']['is_available'])
+        self.assertEqual(1199, status['okta']['calls_remaining'])
+        self.assertTrue(isinstance(status['okta']['time_of_reset'], datetime))
+
+        # this is the fail case
+        status = api_client.check_status()
+        self.assertFalse(status['okta']['is_available'])
 
 
 if __name__ == '__main__':
