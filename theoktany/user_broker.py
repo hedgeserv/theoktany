@@ -46,6 +46,7 @@ class UserBroker:
             factor_dict = {
                 'id': factor['id'],
                 'type': factor['factorType'],
+                'provider': factor['provider'],
             }
             if 'profile' in factor and 'phoneNumber' in factor['profile']:
                 factor_dict['phone_number'] = factor['profile']['phoneNumber']
