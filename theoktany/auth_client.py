@@ -120,7 +120,7 @@ class OktaFactors(object):
         assert passcode
 
         def v(factor_id):
-            route = '/api/v1/users/{}/factors/{}/lifecycle/activate'.format(user_id, factor_id)
+            route = '/api/v1/users/{}/factors/{}/lifecycle/activate?sendEmail=false'.format(user_id, factor_id)
             # noinspection PyArgumentList
             return _validate(*self._api_client.post(route, data=serialize({'passCode': passcode})))
 

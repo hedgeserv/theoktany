@@ -19,6 +19,10 @@ user_five = {
 user_six = {
     'id': None, 'login': 'factors-fail@aol.com', 'email': "factors-fail@aol.com", 'mobile_phone': "345-6789-0123",
     'first_name': 'A', 'last_name': 'A'}
+user_seven = {
+    'id': None, 'login': 'different-email@aol.com', 'email': 'some-email@aol.com', 'mobile_phone': '345-6789-0123',
+    'first_name': 'A', 'last_name': 'A'
+}
 
 
 class TestUserBroker(unittest.TestCase):
@@ -38,9 +42,17 @@ class TestUserBroker(unittest.TestCase):
         self.setup_imposter('create_new_user.json')
         user = self.broker.create_user(user_two)
         self.assertIsNotNone(user)
-        self.assertEqual(user['id'], "00002")
+        self.assertEqual(user['id'], '00002')
         self.assertEqual(user['login'], user_two.get('login'))
         self.assertEqual(user['mobile_phone'], user_two.get('mobile_phone'))
+
+    def test_create_user_with_differing_login_email(self):
+        self.setup_imposter('create_new_user.json')
+        user = self.broker.create_user(user_seven)
+        self.assertIsNotNone(user)
+        self.assertEqual(user['id'], '00002')
+        self.assertEqual(user_seven['login'], user['login'])
+        self.assertEqual(user_seven['email'], user['email'])
 
     def test_update_existing_user_with_id(self):
         self.setup_imposter('update_existing_user.json')
