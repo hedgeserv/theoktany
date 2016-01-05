@@ -1,3 +1,6 @@
+from base64 import b64encode
+import binascii
+
 import requests
 
 from theoktany.serializers import serialize
@@ -36,8 +39,8 @@ def _get_qr_code_from_response(response):
     if '_embedded' in response and 'activation' in response['_embedded']:
         try:
             qr_response = requests.get(response['_embedded']['activation']['_links']['qrcode']['href'], stream=True)
-            return qr_response.raw
-        except (KeyError, requests.RequestException):
+            return b64encode(qr_response.raw.data).decode('UTF-8')
+        except (KeyError, UnicodeDecodeError, binascii.Error, requests.RequestException):
             pass
     return None
 
