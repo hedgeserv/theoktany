@@ -1,0 +1,14 @@
+[
+  {
+    "responses": [
+      {
+        "is": {
+          "headers": {
+            "Content-Type": "image/png"
+          },
+          "body": "some fake content"
+        }
+      }
+    ]
+  }
+]

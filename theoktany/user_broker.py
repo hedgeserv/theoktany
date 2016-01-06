@@ -43,11 +43,14 @@ class UserBroker:
         factors = []
 
         for factor in factors_data:
-            factors.append({
+            factor_dict = {
                 'id': factor['id'],
                 'type': factor['factorType'],
-                'phone_number': factor['profile']['phoneNumber']
-            })
+                'provider': factor['provider'],
+            }
+            if 'profile' in factor and 'phoneNumber' in factor['profile']:
+                factor_dict['phone_number'] = factor['profile']['phoneNumber']
+            factors.append(factor_dict)
 
         return factors
 

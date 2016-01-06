@@ -38,7 +38,8 @@ class SMSAuthTests(unittest.TestCase):
 
     def test_sms_enrollment_success(self):
         auth_client = self.setup_imposter('test_sms_enrollment.json')
-        response, message, error_code = auth_client.enroll_user_for_sms(user_one.get('id'), user_one.get('phone_number'))
+        response, message, error_code = auth_client.enroll_user_for_sms(
+            user_one.get('id'), user_one.get('phone_number'))
         self.assertTrue(response)
         self.assertEqual(response.get('id'), user_one.get('id'))
         self.assertEqual(message, "Success")
@@ -46,7 +47,8 @@ class SMSAuthTests(unittest.TestCase):
 
     def test_sms_enrollment_failure(self):
         auth_client = self.setup_imposter('test_sms_enrollment.json')
-        response, message, error_code = auth_client.enroll_user_for_sms(user_two.get('id'), user_two.get('phone_number'))
+        response, message, error_code = auth_client.enroll_user_for_sms(
+            user_two.get('id'), user_two.get('phone_number'))
         self.assertFalse(response)
         self.assertEqual(message, "Factor already exists.")
         self.assertIsNotNone(error_code)
@@ -77,7 +79,7 @@ class SMSAuthTests(unittest.TestCase):
         auth_client = self.setup_imposter('test_sms_activation.json')
         response, message, error_code = auth_client.activate_sms_factor(user_three.get('id'), '12345')
         self.assertFalse(response)
-        self.assertEqual(message, "Not enrolled for SMS.")
+        self.assertEqual(message, "Not enrolled in factor.")
         self.assertIsNotNone(error_code)
 
     def test_sms_activation_failure_three(self):
@@ -116,7 +118,7 @@ class SMSAuthTests(unittest.TestCase):
         auth_client = self.setup_imposter('test_send_sms_challenge.json')
         response, message, error_code = auth_client.send_sms_challenge(user_three.get('id'))
         self.assertFalse(response)
-        self.assertEqual(message, "Not enrolled for SMS.")
+        self.assertEqual('Not enrolled in factor.', message)
         self.assertIsNotNone(error_code)
 
     def test_verify_sms_challenge_requirements(self):
@@ -133,7 +135,8 @@ class SMSAuthTests(unittest.TestCase):
 
     def test_verify_sms_challenge_failure_one(self):
         auth_client = self.setup_imposter('test_verify_sms_challenge.json')
-        response, message, error_code = auth_client.verify_sms_challenge_passcode(user_two.get('id'), "invalid-passcode")
+        response, message, error_code = auth_client.verify_sms_challenge_passcode(
+            user_two.get('id'), "invalid-passcode")
         self.assertFalse(response)
         self.assertEqual(message, "Your passcode doesn't match our records. Please try again.")
         self.assertEqual('E0000068', error_code)
@@ -148,7 +151,7 @@ class SMSAuthTests(unittest.TestCase):
         auth_client = self.setup_imposter('test_verify_sms_challenge.json')
         response, message, error_code = auth_client.verify_sms_challenge_passcode(user_three.get('id'), '12345')
         self.assertFalse(response)
-        self.assertEqual(message, "Not enrolled for SMS.")
+        self.assertEqual("Not enrolled in factor.", message)
 
     def test_user_is_enrolled_in_sms(self):
         auth_client = self.setup_imposter('test_sms_is_enrolled.json')
