@@ -3,6 +3,9 @@
 from datetime import datetime
 from importlib import reload    # this is Python 3 specific
 import os
+import signal
+import socket
+import time
 import unittest
 from unittest.mock import MagicMock
 
@@ -148,6 +151,83 @@ class TestResponses(unittest.TestCase):
         # this is the fail case
         status = api_client.check_status()
         self.assertFalse(status['okta']['is_available'])
+
+
+class TestTimeouts(unittest.TestCase):
+    # these tests will ONLY work on UNIX-based systems because of the signal package. So no Windows for us.
+
+    def setUp(self):
+        settings.set('BASE_URL', 'http://localhost:9000')
+        settings.set('REQUEST_CONNECTION_TIMEOUT', 0.5)
+        self.client = ApiClient()
+
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.bind(('', 9000))
+
+    def tearDown(self):
+        self.socket.close()
+        reload(theoktany.conf)
+
+    @staticmethod
+    def timeout_handler(signum, frame):
+        raise AssertionError('Connection did not time out!')
+
+    def test_get_timeout(self):
+        # set a timeout in case something goes horribly wrong
+        signal.signal(signal.SIGALRM, self.timeout_handler)
+        signal.alarm(int(3*settings.get('REQUEST_CONNECTION_TIMEOUT')))
+
+        test_start = time.time()
+        response = self.client.get('/')
+        test_end = time.time()
+
+        # stop listening for the signal
+        signal.signal(signal.SIGALRM, lambda *args: None)
+
+        # end-start is going to be a bit more than the timeout
+        self.assertLess(
+            test_end-test_start, 1.5*settings.get('REQUEST_CONNECTION_TIMEOUT'),
+            msg='Connection timeout did not obey setting.')
+
+        self.assertEqual((None, None), response)
+
+    def test_post_timeout(self):
+        # set a timeout in case something goes horribly wrong
+        signal.signal(signal.SIGALRM, self.timeout_handler)
+        signal.alarm(int(3*settings.get('REQUEST_CONNECTION_TIMEOUT')))
+
+        test_start = time.time()
+        response = self.client.post('/')
+        test_end = time.time()
+
+        # stop listening for the signal
+        signal.signal(signal.SIGALRM, lambda *args: None)
+
+        # end-start is going to be a bit more than the timeout
+        self.assertLess(
+            test_end-test_start, 1.5*settings.get('REQUEST_CONNECTION_TIMEOUT'),
+            msg='Connection timeout did not obey setting.')
+
+        self.assertEqual((None, None), response)
+
+    def test_delete_timeout(self):
+        # set a timeout in case something goes horribly wrong
+        signal.signal(signal.SIGALRM, self.timeout_handler)
+        signal.alarm(int(3*settings.get('REQUEST_CONNECTION_TIMEOUT')))
+
+        test_start = time.time()
+        response = self.client.delete('/')
+        test_end = time.time()
+
+        # stop listening for the signal
+        signal.signal(signal.SIGALRM, lambda *args: None)
+
+        # end-start is going to be a bit more than the timeout
+        self.assertLess(
+            test_end-test_start, 1.5*settings.get('REQUEST_CONNECTION_TIMEOUT'),
+            msg='Connection timeout did not obey setting.')
+
+        self.assertEqual((None, None), response)
 
 
 if __name__ == '__main__':
