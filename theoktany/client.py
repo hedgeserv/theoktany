@@ -43,15 +43,30 @@ class ApiClient(object):
         return response_dict, response.status_code
 
     def get(self, path, params=None):
-        response = requests.get(self._base_url+path, params=params, headers=self._headers)
+        try:
+            response = requests.get(
+                self._base_url+path, params=params, headers=self._headers,
+                timeout=self.settings.get('REQUEST_CONNECTION_TIMEOUT'))
+        except requests.ConnectionError:
+            response = None
         return self._process_response(response)
 
     def post(self, path, data=None):
-        response = requests.post(self._base_url+path, data=data, headers=self._headers)
+        try:
+            response = requests.post(
+                self._base_url+path, data=data, headers=self._headers,
+                timeout=self.settings.get('REQUEST_CONNECTION_TIMEOUT'))
+        except requests.ConnectionError:
+            response = None
         return self._process_response(response)
 
     def delete(self, path, params=None):
-        response = requests.delete(self._base_url+path, params=params, headers=self._headers)
+        try:
+            response = requests.delete(
+                self._base_url+path, params=params, headers=self._headers,
+                timeout=self.settings.get('REQUEST_CONNECTION_TIMEOUT'))
+        except requests.ConnectionError:
+            response = None
         return self._process_response(response)
 
     def check_status(self):
@@ -75,8 +90,6 @@ class ApiClient(object):
 
     @staticmethod
     def check_api_response(response, status_code, acceptable_status_codes=None):
-        """Make sure that the API response was what was expected."""
-
         if acceptable_status_codes is None:
             acceptable_status_codes = [200, ]
 
