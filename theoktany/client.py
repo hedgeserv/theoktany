@@ -79,7 +79,7 @@ class ApiClient(object):
                 'okta': {
                     'is_available': is_available,
                     'calls_remaining': int(calls_remaining),
-                    'time_of_reset': datetime.fromtimestamp(int(reset_time)),
+                    'time_of_reset': datetime.utcfromtimestamp(int(reset_time)),
                 }
             }
 
