@@ -22,17 +22,17 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.0.3',
+    version='0.0.4',
 
     description='Library for interacting with OKTA',
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://ghe.hedgeserv.net/shair/theoktany',
+    url='https://github.com/hedgeserv/theoktany',
 
     # Author details
     author='HedgeServ',
-    author_email='shair@hedgeserv.com',
+    author_email='',
 
     # Choose your license
     license='MIT',
@@ -43,7 +43,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 5 - Production/Stable',
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',

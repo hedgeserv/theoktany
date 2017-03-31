@@ -70,7 +70,7 @@ class UserBroker:
         route = self.route
         response, status_code = self._api_client.post(route, user)
 
-        if len(response) and status_code in [200, 201]:
+        if response and status_code in [200, 201]:
             return self._format_user_data_received(response)
 
     def get_user_id(self, email):
@@ -84,7 +84,7 @@ class UserBroker:
 
         # first, get the user data
         user_response, status_code = self._api_client.get(route)
-        if not (len(user_response) and status_code == 200 and 'id' in user_response[0]):
+        if not (user_response and status_code == 200 and 'id' in user_response[0]):
             return None
 
         user_data = self._format_user_data_received(user_response[0])
@@ -106,5 +106,5 @@ class UserBroker:
         route = self._create_update_user_path(user_id)
         response, status_code = self._api_client.post(route, user)
 
-        if len(response) and status_code == 200:
+        if response and status_code == 200:
             return self._format_user_data_received(response)
