@@ -1,10 +1,13 @@
 import json
+import logging
 
 
 class UserBroker:
     def __init__(self, api_client):
         self._api_client = api_client
         self.route = '/api/v1/users'
+
+        self._logger = logging.getLogger(__name__)
 
     @staticmethod
     def _format_user_data_to_send(user_data):
@@ -59,7 +62,8 @@ class UserBroker:
         fields = ['mobile_phone', 'first_name', 'last_name', 'email']
         if not all([field in user and user[field] for field in fields]):
             raise AssertionError(
-                'Dictionary is missing some fields - it must have mobile_phone, first_name, last_name, and email.')
+                'Dictionary is missing some fields - it must have mobile_phone, first_name, '
+                'last_name, and email.')
 
     def _create_update_user_path(self, user_id):
         return self.route + "/" + user_id
@@ -72,6 +76,10 @@ class UserBroker:
 
         if response and status_code in [200, 201]:
             return self._format_user_data_received(response)
+        else:
+            self._logger.warning(
+                'Could not create Okta user "%s": %s, %s', user_data.get('login'), status_code,
+                response)
 
     def get_user_id(self, email):
         user = self.get_user(email)
@@ -79,20 +87,25 @@ class UserBroker:
             return user['id']
 
     def get_user(self, email):
+        self._logger.info('Getting Okta user for %s', email)
         filter_string = 'filter=profile.login+eq+"%s"&limit=1' % email
         route = self.route + '?' + filter_string
 
         # first, get the user data
         user_response, status_code = self._api_client.get(route)
         if not (user_response and status_code == 200 and 'id' in user_response[0]):
+            self._logger.warning(
+                'Could not get user, Okta returned %s: %s', status_code, user_response)
             return None
 
         user_data = self._format_user_data_received(user_response[0])
+        self._logger.debug('Got Okta user %s: %s', user_data['id'], email)
 
         # now, get all the factors
         factor_route = self._create_update_user_path(user_data['id']) + '/factors'
         factors_response, status_code = self._api_client.get(factor_route)
         if not status_code == 200:
+            self._logger.error('Could not get factors from Okta: %s', factors_response)
             return None
         user_data['factors'] = self._format_user_factors_received(factors_response)
 
@@ -107,4 +120,10 @@ class UserBroker:
         response, status_code = self._api_client.post(route, user)
 
         if response and status_code == 200:
+            self._logger.info(
+                'Updated phone number to "%s" for Okta user %s', phone_number, user_id)
             return self._format_user_data_received(response)
+        else:
+            self._logger.error(
+                'Could not update phone number to "%s" for Okta user %s: %s', phone_number,
+                user_id, response)

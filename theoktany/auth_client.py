@@ -1,3 +1,4 @@
+import logging
 import requests
 
 from theoktany.serializers import serialize
@@ -20,6 +21,7 @@ def _validate(response, status_code):
     except KeyError:
         message = 'Okta returned {}.'.format(status_code)
 
+    logging.getLogger(__name__).error('Received error from Okta: %s %s', error_code, message)
     return False, message, error_code
 
 
@@ -35,7 +37,8 @@ def _get_shared_secret_from_response(response):
 def _get_qr_code_from_response(response):
     if '_embedded' in response and 'activation' in response['_embedded']:
         try:
-            qr_response = requests.get(response['_embedded']['activation']['_links']['qrcode']['href'], stream=True)
+            qr_response = requests.get(
+                response['_embedded']['activation']['_links']['qrcode']['href'], stream=True)
             return qr_response.raw.data
         except (KeyError, requests.RequestException):
             pass
@@ -43,16 +46,20 @@ def _get_qr_code_from_response(response):
 
 
 class OktaFactors(object):
-    def __init__(self, api_client=ApiClient):
+    def __init__(self, api_client: ApiClient):
         self._api_client = api_client
+        self._logger = logging.getLogger(__name__)
 
     def get_factors(self, user_id):
-        # noinspection PyArgumentList
+        self._logger.debug('Getting factors for Okta user %s', user_id)
         return _validate(*self._api_client.get('/api/v1/users/{}/factors'.format(user_id)))
 
     @staticmethod
     def filter_by_type(factors, factor_type='sms', provider='OKTA'):
-        return [factor for factor in factors if factor['factorType'] == factor_type and factor['provider'] == provider]
+        return [
+            factor for factor in factors if
+            factor['factorType'] == factor_type and factor['provider'] == provider
+        ]
 
     @staticmethod
     def create_factor_object(factor_type, provider, phone_number=None):
@@ -75,7 +82,9 @@ class OktaFactors(object):
         if factors and not error_code:
             filtered_factors = self.filter_by_type(factors, factor_type, provider)
             if filtered_factors and filtered_factors[0]['status'] == 'ACTIVE':
+                self._logger.debug('Okta user %s is enrolled in %s factor', user_id, factor_type)
                 return True
+        self._logger.debug('Okta user %s is not enrolled in %s factor', user_id, factor_type)
         return False
 
     def call_with_correct_factor(self, v, user_id, factor_type, provider):
@@ -89,15 +98,20 @@ class OktaFactors(object):
             else:
                 return False, "Not enrolled in factor.", '1'
 
+        self._logger.warning('Received error %s from Okta: %s', error_code, message)
         return False, message, error_code
 
     def enroll(self, user_id, phone_number=None, factor_type='sms', provider='OKTA'):
         assert user_id
-        assert (phone_number and factor_type == 'sms') or (not phone_number and factor_type != 'sms')
+        assert (phone_number and factor_type == 'sms') or \
+            (not phone_number and factor_type != 'sms')
         assert factor_type
         assert provider
 
-        data = self.create_factor_object(provider=provider, factor_type=factor_type, phone_number=phone_number)
+        self._logger.info('Enrolling Okta user %s in %s factor', user_id, factor_type)
+
+        data = self.create_factor_object(
+            provider=provider, factor_type=factor_type, phone_number=phone_number)
         route = '/api/v1/users/{}/factors'.format(user_id)
 
         if factor_type == 'sms':
@@ -119,8 +133,11 @@ class OktaFactors(object):
         assert user_id
         assert passcode
 
+        self._logger.info('Activating %s factor for Okta user %s', factor_type, user_id)
+
         def v(factor_id):
-            route = '/api/v1/users/{}/factors/{}/lifecycle/activate?sendEmail=false'.format(user_id, factor_id)
+            route = '/api/v1/users/{}/factors/{}/lifecycle/activate?sendEmail=false'.format(
+                user_id, factor_id)
             # noinspection PyArgumentList
             return _validate(*self._api_client.post(route, data=serialize({'passCode': passcode})))
 
@@ -128,6 +145,8 @@ class OktaFactors(object):
 
     def delete(self, user_id, factor_type='sms', provider='OKTA'):
         assert user_id
+
+        self._logger.info('Removing %s factor from Okta user %s', factor_type, user_id)
 
         def v(factor_id):
             route = '/api/v1/users/{}/factors/{}'.format(user_id, factor_id)
@@ -139,6 +158,8 @@ class OktaFactors(object):
     def challenge(self, user_id, factor_type='sms', provider='OKTA'):
         assert user_id
 
+        self._logger.info('Challenging Okta user %s for %s factor', user_id, factor_type)
+
         def v(factor_id):
             route = '/api/v1/users/{}/factors/{}/verify'.format(user_id, factor_id)
             # noinspection PyArgumentList
@@ -149,6 +170,8 @@ class OktaFactors(object):
     def verify(self, user_id, passcode, factor_type='sms', provider='OKTA'):
         assert user_id
         assert passcode
+
+        self._logger.info('Verifying %s factor for Okta user %s', factor_type, user_id)
 
         def v(factor_id):
             route = '/api/v1/users/{}/factors/{}/verify'.format(user_id, factor_id)
@@ -191,13 +214,16 @@ class OktaAuthClient(object):
         return self.factors.enroll(user_id, factor_type='token:software:totp', provider='GOOGLE')
 
     def activate_google_authenticator_factor(self, user_id, passcode):
-        return self.factors.activate(user_id, passcode, factor_type='token:software:totp', provider='GOOGLE')
+        return self.factors.activate(
+            user_id, passcode, factor_type='token:software:totp', provider='GOOGLE')
 
     def verify_google_authenticator_factor(self, user_id, passcode):
-        return self.factors.verify(user_id, passcode, factor_type='token:software:totp', provider='GOOGLE')
+        return self.factors.verify(
+            user_id, passcode, factor_type='token:software:totp', provider='GOOGLE')
 
     def is_user_enrolled_for_google_authenticator(self, user_id):
-        return self.factors.is_enrolled(user_id, factor_type='token:software:totp', provider='GOOGLE')
+        return self.factors.is_enrolled(
+            user_id, factor_type='token:software:totp', provider='GOOGLE')
 
     def delete_google_authenticator_factor(self, user_id):
         return self.factors.delete(user_id, factor_type='token:software:totp', provider='GOOGLE')
